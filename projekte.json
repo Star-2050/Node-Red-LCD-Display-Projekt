@@ -453,7 +453,7 @@
         "debounce": "100",
         "read": false,
         "bcm": true,
-        "x": 300,
+        "x": 270,
         "y": 1080,
         "wires": [
             [
