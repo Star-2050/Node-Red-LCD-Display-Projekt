@@ -289,7 +289,7 @@
         "type": "function",
         "z": "73619a0e20b766b0",
         "name": "Update Display Based on Mode",
-        "func": "// Get current switches mode\nconst switchesMode = flow.get('switches_mode') || 'time';\n\n// DEBUG mode\nnode.log(\"DISPLAY HANDLER - Current mode: \" + switchesMode);\n\n// Get weather display mode (only applies when in weather mode)\nconst weatherMode = flow.get('weather_mode') || 'temperature';\n\n// Get data from flow context\nconst temperature = flow.get('temperature') || 'N/A';\nconst humidity = flow.get('humidity') || 'N/A';\nconst wind = flow.get('wind') || 'N/A';\nconst description = flow.get('description') || 'N/A';\nconst city = flow.get('city') || 'Connecting...';\n\n// Time-specific data\nconst now = new Date();\nconst hours = now.getHours();\nconst minutes = now.getMinutes();\nconst seconds = now.getSeconds();\nconst timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;\nconst dateStr = now.toLocaleDateString('de-DE');\n\n// Clean function to remove/replace problematic characters\nfunction cleanText(text) {\n    if (typeof text !== 'string') return 'N/A';\n    \n    // Replace HTML entities and problematic characters\n    return text\n        .replace(/&#x2F;/g, '|')         // Replace HTML entity for slash\n        .replace(/&#(\\d+);/g, '')        // Remove all other HTML entities\n        .replace(/[^\\x20-\\x7E]/g, '')    // Keep only basic ASCII characters\n        .replace(/[^\\w\\s.,°%\\/-:]/g, ''); // Keep only alphanumeric, spaces, and some symbols\n}\n\n// Ensure values are strings and limit to display width (16 chars for standard LCD)\nfunction formatForDisplay(text, maxLength = 16) {\n    let cleaned = cleanText(String(text));\n    return cleaned.length > maxLength ? cleaned.substring(0, maxLength) : cleaned;\n}\n\n// Clean all displayed text\nconst cleanCity = formatForDisplay(city);\nconst cleanTemp = formatForDisplay(temperature);\nconst cleanHumidity = formatForDisplay(humidity);\nconst cleanWind = formatForDisplay(wind);\nconst cleanTimeStr = formatForDisplay(timeStr);\nconst cleanDateStr = formatForDisplay(dateStr);\n\n// Special formatting for description - capitalize first letter\nlet cleanDescription = formatForDisplay(description);\nif (cleanDescription.length > 0) {\n    cleanDescription = cleanDescription.charAt(0).toUpperCase() + cleanDescription.slice(1);\n}\n\n// Prepare messages for line 1 and 2\nlet line1;\nlet line2;\n\n// Mode 1: Time display (both switches OFF)\nif (switchesMode === 'time') {\n    line1 = { payload: \"Datum : \"+cleanDateStr, line: 1 };\n    line2 = { payload:  cleanTimeStr, line: 2 };\n    node.log(\"Display set to TIME mode\");\n}\n// Mode 2: Weather display (switch 1 ON, switch 2 OFF)\nelse if (switchesMode === 'weather') {\n    // Sub-modes for weather display based on weatherMode\n    node.log(\"Display set to WEATHER mode, sub-mode: \" + weatherMode);\n    switch(weatherMode) {\n        case 'temperature':\n            line1 = { payload: \"Temperatur\", line: 1 };\n            line2 = { payload: cleanTemp, line: 2 };\n            break;\n        case 'humidity':\n            line1 = { payload: \"Luftfeuchtigkeit\", line: 1 };\n            line2 = { payload: cleanHumidity, line: 2 };\n            break;\n        case 'wind':\n            line1 = { payload: \"Windgeschwindigk.\", line: 1 };\n            line2 = { payload: cleanWind, line: 2 };\n            break;\n        case 'description':\n            line1 = { payload: \"Wetterlage\", line: 1 };\n            line2 = { payload: cleanDescription, line: 2 };\n            break;\n        default:\n            line1 = { payload: \"Temperatur\", line: 1 };\n            line2 = { payload: cleanTemp, line: 2 };\n    }\n}\n// Mode 3: System info (switch 1 OFF, switch 2 ON)\nelse if (switchesMode === 'Stock') {\n    // Get uptime using 'uptime' command\n    node.log(\"Display set to SYSTEM mode\");\n    //const execSync = require('child_process').execSync;\n    let systemInfo;\n    try {\n        // Try to get system info\n        systemInfo = \"System aktiv\";\n    } catch (e) {\n        systemInfo = \"System Info N/A\";\n    }\n    \n    line1 = { payload: \"System Info\", line: 1 };\n    line2 = { payload: formatForDisplay(systemInfo), line: 2 };\n}\n\n// Mode 4: Custom message (both switches ON)\nelse if (switchesMode === 'custom') {\n    node.log(\"Display set to CUSTOM mode\");\n    line1 = { payload: \"Benutzerdefiniert\", line: 1 };\n    line2 = { payload: \"Hallo Welt!\", line: 2 };\n}\n// Default fallback to time display\nelse {\n    node.warn(\"Unknown mode: \" + switchesMode + \", defaulting to TIME\");\n    line1 = { payload: \"Datum\", line: 1 };\n    line2 = { payload: cleanDateStr + \" \" + cleanTimeStr, line: 2 };\n}\n\n// Return both messages as array\nreturn [line1, line2];",
+        "func": "// Get current switches mode\nconst switchesMode = flow.get('switches_mode') || 'time';\n\n// DEBUG mode\nnode.log(\"DISPLAY HANDLER - Current mode: \" + switchesMode);\n\n// Get weather display mode (only applies when in weather mode)\nconst weatherMode = flow.get('weather_mode') || 'temperature';\n\n// Get data from flow context\nconst temperature = flow.get('temperature') || 'N/A';\nconst humidity = flow.get('humidity') || 'N/A';\nconst wind = flow.get('wind') || 'N/A';\nconst description = flow.get('description') || 'N/A';\nconst city = flow.get('city') || 'Connecting...';\n\n// Time-specific data\nconst now = new Date();\nconst hours = now.getHours();\nconst minutes = now.getMinutes();\nconst seconds = now.getSeconds();\nconst timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;\nconst dateStr = now.toLocaleDateString('de-DE');\n\n// Clean function to remove/replace problematic characters\nfunction cleanText(text) {\n    if (typeof text !== 'string') return 'N/A';\n    \n    // Replace HTML entities and problematic characters\n    return text\n        .replace(/&#x2F;/g, '|')         // Replace HTML entity for slash\n        .replace(/&#(\\d+);/g, '')        // Remove all other HTML entities\n        .replace(/[^\\x20-\\x7E]/g, '')    // Keep only basic ASCII characters\n        .replace(/[^\\w\\s.,°%\\/-:]/g, ''); // Keep only alphanumeric, spaces, and some symbols\n}\n\n// Ensure values are strings and limit to display width (16 chars for standard LCD)\nfunction formatForDisplay(text, maxLength = 16) {\n    let cleaned = cleanText(String(text));\n    return cleaned.length > maxLength ? cleaned.substring(0, maxLength) : cleaned;\n}\n\n// Clean all displayed text\nconst cleanCity = formatForDisplay(city);\nconst cleanTemp = formatForDisplay(temperature);\nconst cleanHumidity = formatForDisplay(humidity);\nconst cleanWind = formatForDisplay(wind);\nconst cleanTimeStr = formatForDisplay(timeStr);\nconst cleanDateStr = formatForDisplay(dateStr);\n\n// Special formatting for description - capitalize first letter\nlet cleanDescription = formatForDisplay(description);\nif (cleanDescription.length > 0) {\n    cleanDescription = cleanDescription.charAt(0).toUpperCase() + cleanDescription.slice(1);\n}\n\n// Prepare messages for line 1 and 2\nlet line1;\nlet line2;\n\n// Mode 1: Time display (both switches OFF)\nif (switchesMode === 'time') {\n    line1 = { payload: \"Datum : \"+cleanDateStr, line: 1 };\n    line2 = { payload:  cleanTimeStr, line: 2 };\n    node.log(\"Display set to TIME mode\");\n}\n// Mode 2: Weather display (switch 1 ON, switch 2 OFF)\nelse if (switchesMode === 'weather') {\n    // Sub-modes for weather display based on weatherMode\n    node.log(\"Display set to WEATHER mode, sub-mode: \" + weatherMode);\n    switch(weatherMode) {\n        case 'temperature':\n            line1 = { payload: \"Temperatur\", line: 1 };\n            line2 = { payload: cleanTemp, line: 2 };\n            break;\n        case 'humidity':\n            line1 = { payload: \"Luftfeuchtigkeit\", line: 1 };\n            line2 = { payload: cleanHumidity, line: 2 };\n            break;\n        case 'wind':\n            line1 = { payload: \"Windgeschwindigk.\", line: 1 };\n            line2 = { payload: cleanWind, line: 2 };\n            break;\n        case 'description':\n            line1 = { payload: \"Wetterlage\", line: 1 };\n            line2 = { payload: cleanDescription, line: 2 };\n            break;\n        default:\n            line1 = { payload: \"Temperatur\", line: 1 };\n            line2 = { payload: cleanTemp, line: 2 };\n    }\n}\n// Mode 3: Stock info (switch 1 OFF, switch 2 ON)\nelse if (switchesMode === 'Stock') {\n    node.log(\"Display set to STOCK mode\");\n\n    // Hole alle gespeicherten Werte aus dem Flow-Kontext\n    const stockPrice = flow.get('stock_price') || 'N/A';\n    const stockChange = flow.get('stock_change') || 'N/A';\n    const stockSymbol = flow.get('stock_symbol') || 'AAPL';\n    const currentTime = flow.get('current_time') || 'N/A';\n\n    // Hole Stock-Display-Modus\n    const stockMode = flow.get('stock_mode') || 'price';\n\n    switch (stockMode) {\n        case 'price':\n            line1 = { payload: formatForDisplay(stockSymbol + \" Kurs\"), line: 1 };\n            line2 = { payload: formatForDisplay(stockPrice), line: 2 };\n            break;\n        case 'change':\n            line1 = { payload: formatForDisplay(stockSymbol + \" Änderung\"), line: 1 };\n            line2 = { payload: formatForDisplay(stockChange), line: 2 };\n            break;\n        case 'full':\n            line1 = { payload: formatForDisplay(stockSymbol + \" \" + stockPrice), line: 1 };\n            line2 = { payload: formatForDisplay(stockChange), line: 2 };\n            break;\n        default:\n            line1 = { payload: formatForDisplay(stockSymbol), line: 1 };\n            line2 = { payload: formatForDisplay(stockPrice), line: 2 };\n    }\n}\n\n// Mode 4: Custom message (both switches ON)\nelse if (switchesMode === 'custom') {\n    node.log(\"Display set to CUSTOM mode\");\n    line1 = { payload: \"Benutzerdefiniert\", line: 1 };\n    line2 = { payload: \"Hallo Welt!\", line: 2 };\n}\n// Default fallback to time display\nelse {\n    node.warn(\"Unknown mode: \" + switchesMode + \", defaulting to TIME\");\n    line1 = { payload: \"Datum\", line: 1 };\n    line2 = { payload: cleanDateStr + \" \" + cleanTimeStr, line: 2 };\n}\n\n// Return both messages as array\nreturn [line1, line2];",
         "outputs": 2,
         "timeout": "",
         "noerr": 0,
@@ -722,10 +722,12 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 320,
+        "x": 360,
         "y": 1360,
         "wires": [
-            []
+            [
+                "f15478bfc1c3599a"
+            ]
         ]
     },
     {
@@ -740,10 +742,12 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 300,
+        "x": 340,
         "y": 1440,
         "wires": [
-            []
+            [
+                "f77d641a8a31eefa"
+            ]
         ]
     },
     {
@@ -762,8 +766,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 450,
-        "y": 1620,
+        "x": 680,
+        "y": 1380,
         "wires": [
             [
                 "4dc88d47b438f970"
@@ -778,8 +782,8 @@
         "method": "GET",
         "ret": "obj",
         "url": "https://finnhub.io/api/v1/quote?symbol=AAPL&token=DEIN_API_KEY",
-        "x": 710,
-        "y": 1620,
+        "x": 950,
+        "y": 1380,
         "wires": [
             [
                 "36b0baf81d79c4cc"
@@ -793,57 +797,11 @@
         "name": "Formatiere und speichere Aktiendaten",
         "func": "// Überprüfe, ob gültige Daten vorhanden sind\nif (!msg.payload || !msg.payload.c) {\n    node.error(\"Ungültige Aktiendaten erhalten\");\n    return null;\n}\n\n// Extrahiere und formatiere Daten\nconst stockData = msg.payload;\n\n// Aktuelle Zeit\nconst now = new Date();\nconst hours = now.getHours();\nconst minutes = now.getMinutes();\nconst timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes;\n\n// Aktienpreis und Änderungen\nconst currentPrice = stockData.c.toFixed(2) + '$';\nconst change = stockData.d.toFixed(2);\nconst percentChange = stockData.dp.toFixed(2) + '%';\n\n// Pfeil-Symbol basierend auf Kursänderung\nconst arrow = percentChange >= 0 ? '↑' : '↓';\nconst changeFormat = arrow + ' ' + Math.abs(change) + '$ (' + Math.abs(parseFloat(percentChange)) + '%)';\n\n// Speichere alle Daten im Flow-Kontext\nflow.set('stock_price', currentPrice);\nflow.set('stock_change', changeFormat);\nflow.set('stock_symbol', 'AAPL');\nflow.set('current_time', timeStr);\n\n// Setze standardmäßigen Anzeigemodus, falls nicht gesetzt\nif (!flow.get('display_mode')) {\n    flow.set('display_mode', 'stock_price');\n}\n\n// Hole Anzeigemodus\nconst displayMode = flow.get('display_mode') || 'stock_price';\n\n// Sende aktuellen Anzeigemodus zum Display-Handler\nmsg.payload = displayMode;\n\n// Füge Zeitstempel der letzten Aktualisierung hinzu\nflow.set('last_updated', Date.now());\n\nreturn msg;",
         "outputs": 1,
-        "x": 970,
-        "y": 1620,
+        "x": 1210,
+        "y": 1380,
         "wires": [
             [
-                "5885ee436ddfd25c"
-            ]
-        ]
-    },
-    {
-        "id": "5885ee436ddfd25c",
-        "type": "function",
-        "z": "73619a0e20b766b0",
-        "name": "Display Handler",
-        "func": "// Hole alle gespeicherten Werte aus dem Flow-Kontext\nconst stockPrice = flow.get('stock_price') || 'N/A';\nconst stockChange = flow.get('stock_change') || 'N/A';\nconst stockSymbol = flow.get('stock_symbol') || 'AAPL';\nconst currentTime = flow.get('current_time') || 'N/A';\n\n// Bestimme Anzeigemodus basierend auf Eingabe\nconst displayMode = msg.payload;\n\n// Erstelle Nachrichten für beide Zeilen des Displays\nlet line1 = '';\nlet line2 = '';\n\nswitch(displayMode) {\n    case 'stock_price':\n        line1 = stockSymbol + ' ' + currentTime;\n        line2 = stockPrice;\n        break;\n    case 'stock_change':\n        line1 = stockSymbol + ' ' + stockPrice;\n        line2 = stockChange;\n        break;\n    case 'full_info':\n        line1 = stockSymbol + ' ' + stockPrice;\n        line2 = stockChange;\n        break;\n    default:\n        line1 = stockSymbol + ' ' + currentTime;\n        line2 = stockPrice;\n}\n\n// Erstelle zwei Nachrichten für die zwei Zeilen\nreturn [\n    { payload: line1, line: 1 },\n    { payload: line2, line: 2 }\n];",
-        "outputs": 2,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1230,
-        "y": 1620,
-        "wires": [
-            [
-                "128826b0d4c017fe"
-            ],
-            [
-                "128826b0d4c017fe"
-            ]
-        ]
-    },
-    {
-        "id": "1ab3cc7a690d8773",
-        "type": "inject",
-        "z": "73619a0e20b766b0",
-        "name": "Wechsle Aktie",
-        "props": [
-            {
-                "p": "payload",
-                "v": "switch_stock",
-                "vt": "str"
-            }
-        ],
-        "repeat": "900",
-        "once": false,
-        "onceDelay": 0.1,
-        "x": 450,
-        "y": 1680,
-        "wires": [
-            [
-                "f15478bfc1c3599a"
+                "85e67035ab842076"
             ]
         ]
     },
@@ -889,29 +847,7 @@
         "y": 1680,
         "wires": [
             [
-                "5885ee436ddfd25c"
-            ]
-        ]
-    },
-    {
-        "id": "e6972b97c9a46d20",
-        "type": "inject",
-        "z": "73619a0e20b766b0",
-        "name": "Wechsle Anzeigemodus",
-        "props": [
-            {
-                "p": "payload",
-                "v": "switch_mode",
-                "vt": "str"
-            }
-        ],
-        "repeat": "20",
-        "once": false,
-        "x": 450,
-        "y": 1740,
-        "wires": [
-            [
-                "f77d641a8a31eefa"
+                "85e67035ab842076"
             ]
         ]
     },
@@ -927,119 +863,13 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 720,
-        "y": 1740,
+        "x": 690,
+        "y": 1440,
         "wires": [
             [
-                "5885ee436ddfd25c"
+                "85e67035ab842076"
             ]
         ]
-    },
-    {
-        "id": "128826b0d4c017fe",
-        "type": "template",
-        "z": "73619a0e20b766b0",
-        "name": "Build Write Command",
-        "field": "payload",
-        "fieldType": "msg",
-        "format": "handlebars",
-        "syntax": "mustache",
-        "template": " --line \"{{line}}\" --message \"{{payload}}\"",
-        "output": "str",
-        "x": 1550,
-        "y": 1740,
-        "wires": [
-            [
-                "9b78af43ff2c452e",
-                "f40830d482a02aa7"
-            ]
-        ]
-    },
-    {
-        "id": "9b78af43ff2c452e",
-        "type": "exec",
-        "z": "73619a0e20b766b0",
-        "command": "python /home/star2050/digilab/lcd/write.py",
-        "addpay": "payload",
-        "append": "",
-        "useSpawn": "false",
-        "timer": "",
-        "winHide": false,
-        "oldrc": false,
-        "name": "Run Write Script",
-        "x": 1810,
-        "y": 1740,
-        "wires": [
-            [
-                "06b7fbb97636121b"
-            ],
-            [
-                "3e58c0e3ec32a559"
-            ],
-            [
-                "6046bae53149ec4a"
-            ]
-        ]
-    },
-    {
-        "id": "06b7fbb97636121b",
-        "type": "debug",
-        "z": "73619a0e20b766b0",
-        "name": "Write stdout",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "x": 2040,
-        "y": 1720,
-        "wires": []
-    },
-    {
-        "id": "3e58c0e3ec32a559",
-        "type": "debug",
-        "z": "73619a0e20b766b0",
-        "name": "Write stderr",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "x": 2040,
-        "y": 1760,
-        "wires": []
-    },
-    {
-        "id": "6046bae53149ec4a",
-        "type": "debug",
-        "z": "73619a0e20b766b0",
-        "name": "Write RC",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "x": 2030,
-        "y": 1800,
-        "wires": []
-    },
-    {
-        "id": "f40830d482a02aa7",
-        "type": "debug",
-        "z": "73619a0e20b766b0",
-        "name": "Debug Write Command",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "x": 1840,
-        "y": 1680,
-        "wires": []
     },
     {
         "id": "56b01de72cde712b",
@@ -1054,7 +884,29 @@
         "x": 110,
         "y": 1120,
         "wires": [
-            []
+            [
+                "94012a64319fa51b"
+            ]
+        ]
+    },
+    {
+        "id": "85e67035ab842076",
+        "type": "function",
+        "z": "73619a0e20b766b0",
+        "name": "Stock Data Processor",
+        "func": "// Überprüfe, ob gültige Daten vorhanden sind\nif (!msg.payload || !msg.payload.c) {\n    node.error(\"Ungültige Aktiendaten erhalten\");\n    return null;\n}\n\n// Extrahiere und formatiere Daten\nconst stockData = msg.payload;\nconst symbol = msg.symbol || 'AAPL';\n\n// Aktuelle Zeit\nconst now = new Date();\nconst hours = now.getHours();\nconst minutes = now.getMinutes();\nconst timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes;\n\n// Aktienpreis und Änderungen\nconst currentPrice = stockData.c.toFixed(2) + '$';\nconst change = stockData.d.toFixed(2);\nconst percentChange = stockData.dp.toFixed(2) + '%';\n\n// Pfeil-Symbol basierend auf Kursänderung\nconst arrow = percentChange >= 0 ? '↑' : '↓';\nconst changeFormat = arrow + ' ' + Math.abs(change) + '$ (' + Math.abs(parseFloat(percentChange)) + '%)';\n\n// Speichere alle Daten im Flow-Kontext\nflow.set('stock_price', currentPrice);\nflow.set('stock_change', changeFormat);\nflow.set('stock_symbol', symbol);\nflow.set('current_time', timeStr);\n\n// Rotiere Stock Mode (price -> change -> full)\nconst modes = ['price', 'change', 'full'];\nconst currentMode = flow.get('stock_mode') || 'price';\nconst currentIndex = modes.indexOf(currentMode);\nconst nextIndex = (currentIndex + 1) % modes.length;\nflow.set('stock_mode', modes[nextIndex]);\n\n// Setze switches_mode auf Stock\nflow.set('switches_mode', 'Stock');\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 1,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1700,
+        "y": 1720,
+        "wires": [
+            [
+                "1996b9100a3bb7f4"
+            ]
         ]
     },
     {
