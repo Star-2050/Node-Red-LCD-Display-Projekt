@@ -479,7 +479,7 @@
         "z": "73619a0e20b766b0",
         "name": "Mode Switch Button",
         "pin": "16",
-        "intype": "up",
+        "intype": "down",
         "debounce": "100",
         "read": false,
         "bcm": true,
