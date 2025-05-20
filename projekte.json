@@ -32,8 +32,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 150,
-        "y": 340,
+        "x": 140,
+        "y": 160,
         "wires": [
             [
                 "ae263271ad2da54a"
@@ -56,8 +56,8 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 420,
-        "y": 340,
+        "x": 410,
+        "y": 160,
         "wires": [
             [
                 "1b2247d8010a5ca5",
@@ -78,8 +78,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 430,
-        "y": 280,
+        "x": 420,
+        "y": 100,
         "wires": []
     },
     {
@@ -94,8 +94,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 650,
-        "y": 340,
+        "x": 640,
+        "y": 160,
         "wires": [
             [
                 "13b9f24fe92121be",
@@ -116,8 +116,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 660,
-        "y": 280,
+        "x": 650,
+        "y": 100,
         "wires": []
     },
     {
@@ -141,8 +141,8 @@
         "once": true,
         "onceDelay": "1",
         "topic": "init",
-        "x": 180,
-        "y": 460,
+        "x": 170,
+        "y": 280,
         "wires": [
             [
                 "672637f87c614915"
@@ -161,8 +161,8 @@
         "winHide": false,
         "oldrc": false,
         "name": "Run Init/Clear Script",
-        "x": 430,
-        "y": 460,
+        "x": 420,
+        "y": 280,
         "wires": [
             [
                 "8aa95754f430fa79"
@@ -232,8 +232,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 660,
-        "y": 420,
+        "x": 650,
+        "y": 240,
         "wires": []
     },
     {
@@ -247,8 +247,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 660,
-        "y": 460,
+        "x": 650,
+        "y": 280,
         "wires": []
     },
     {
@@ -262,8 +262,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 650,
-        "y": 500,
+        "x": 640,
+        "y": 320,
         "wires": []
     },
     {
@@ -338,8 +338,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 970,
-        "y": 460,
+        "x": 960,
+        "y": 280,
         "wires": [
             [
                 "f90fee67abce26fb"
@@ -359,8 +359,8 @@
         "debounce": "100",
         "read": false,
         "bcm": true,
-        "x": 150,
-        "y": 600,
+        "x": 140,
+        "y": 420,
         "wires": [
             [
                 "885b20d05f14619c",
@@ -379,8 +379,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 610,
-        "y": 600,
+        "x": 600,
+        "y": 420,
         "wires": [
             [
                 "13b9f24fe92121be",
@@ -401,8 +401,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 350,
-        "y": 640,
+        "x": 340,
+        "y": 460,
         "wires": []
     },
     {
@@ -418,8 +418,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 880,
-        "y": 600,
+        "x": 870,
+        "y": 420,
         "wires": []
     },
     {
@@ -439,8 +439,8 @@
         "topic": "",
         "payload": "check",
         "payloadType": "str",
-        "x": 180,
-        "y": 400,
+        "x": 170,
+        "y": 220,
         "wires": [
             [
                 "9c76e11a3254fb82"
@@ -458,8 +458,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 420,
-        "y": 400,
+        "x": 410,
+        "y": 220,
         "wires": [
             [
                 "ae263271ad2da54a"
@@ -472,7 +472,7 @@
         "z": "fa7e41cd5565ceab",
         "name": "",
         "pauseType": "delay",
-        "timeout": "500",
+        "timeout": "200",
         "timeoutUnits": "milliseconds",
         "rate": "1",
         "nbRateUnits": "1",
@@ -483,8 +483,8 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 1210,
-        "y": 500,
+        "x": 1200,
+        "y": 320,
         "wires": [
             [
                 "f90fee67abce26fb"
@@ -501,8 +501,8 @@
         "debounce": "25",
         "read": false,
         "bcm": true,
-        "x": 140,
-        "y": 740,
+        "x": 130,
+        "y": 560,
         "wires": [
             []
         ]
@@ -517,21 +517,8 @@
         "debounce": "25",
         "read": false,
         "bcm": true,
-        "x": 140,
-        "y": 800,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "a2f74bb3891d97bc",
-        "type": "catch",
-        "z": "fa7e41cd5565ceab",
-        "name": "",
-        "scope": null,
-        "uncaught": true,
-        "x": 240,
-        "y": 60,
+        "x": 130,
+        "y": 620,
         "wires": [
             []
         ]
