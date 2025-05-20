@@ -32,8 +32,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 190,
-        "y": 660,
+        "x": 310,
+        "y": 700,
         "wires": [
             [
                 "b3cfd559401f9bfa"
@@ -56,8 +56,8 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 460,
-        "y": 660,
+        "x": 580,
+        "y": 700,
         "wires": [
             [
                 "733d598a4f7b149d",
@@ -78,8 +78,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 470,
-        "y": 600,
+        "x": 590,
+        "y": 640,
         "wires": []
     },
     {
@@ -94,8 +94,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 690,
-        "y": 660,
+        "x": 810,
+        "y": 700,
         "wires": [
             [
                 "1996b9100a3bb7f4",
@@ -116,9 +116,53 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 750,
-        "y": 600,
+        "x": 870,
+        "y": 640,
         "wires": []
+    },
+    {
+        "id": "33bac39479946e4c",
+        "type": "inject",
+        "z": "73619a0e20b766b0",
+        "name": "Error Recovery (every hour)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0,
+        "topic": "",
+        "payload": "check",
+        "payloadType": "str",
+        "x": 340,
+        "y": 760,
+        "wires": [
+            [
+                "1d5642a82f5f8ae0"
+            ]
+        ]
+    },
+    {
+        "id": "1d5642a82f5f8ae0",
+        "type": "function",
+        "z": "73619a0e20b766b0",
+        "name": "Check Last Update Time",
+        "func": "// Get last update timestamp\nconst lastUpdated = flow.get('last_updated') || 0;\nconst now = Date.now();\n\n// If no update in the last 20 minutes (1200000ms), force refresh\nif (now - lastUpdated > 1200000) {\n    node.warn(\"No weather updates for 20+ minutes. Forcing refresh.\");\n    // Set payload to trigger a new weather fetch\n    msg.payload = Date.now();\n    return msg;\n}\n\n// Otherwise no need to do anything\nreturn null;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 760,
+        "wires": [
+            [
+                "b3cfd559401f9bfa"
+            ]
+        ]
     },
     {
         "id": "3e8f8cd8f307e956",
@@ -141,8 +185,8 @@
         "once": true,
         "onceDelay": "1",
         "topic": "init",
-        "x": 220,
-        "y": 780,
+        "x": 340,
+        "y": 820,
         "wires": [
             [
                 "d72a326f373d8fc1"
@@ -161,8 +205,8 @@
         "winHide": false,
         "oldrc": false,
         "name": "Run Init/Clear Script",
-        "x": 470,
-        "y": 780,
+        "x": 590,
+        "y": 820,
         "wires": [
             [
                 "21f554a9c2ef9cce"
@@ -172,52 +216,6 @@
             ],
             [
                 "5af4fd7514fecd4c"
-            ]
-        ]
-    },
-    {
-        "id": "cd04a40c673c7eee",
-        "type": "template",
-        "z": "73619a0e20b766b0",
-        "name": "Build Write Command",
-        "field": "payload",
-        "fieldType": "msg",
-        "format": "handlebars",
-        "syntax": "mustache",
-        "template": " --line \"{{line}}\" --message \"{{payload}}\"",
-        "output": "str",
-        "x": 1580,
-        "y": 940,
-        "wires": [
-            [
-                "37d4dde3f2ade25d",
-                "02785858b756d613"
-            ]
-        ]
-    },
-    {
-        "id": "37d4dde3f2ade25d",
-        "type": "exec",
-        "z": "73619a0e20b766b0",
-        "command": "python /home/star2050/digilab/lcd/write.py",
-        "addpay": "payload",
-        "append": "",
-        "useSpawn": "false",
-        "timer": "",
-        "winHide": false,
-        "oldrc": false,
-        "name": "Run Write Script",
-        "x": 1860,
-        "y": 940,
-        "wires": [
-            [
-                "0b7b303e8658b7e5"
-            ],
-            [
-                "7316b9a11ecd1b87"
-            ],
-            [
-                "d508ef3e520866ee"
             ]
         ]
     },
@@ -232,8 +230,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 700,
-        "y": 740,
+        "x": 820,
+        "y": 780,
         "wires": []
     },
     {
@@ -247,8 +245,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 700,
-        "y": 780,
+        "x": 820,
+        "y": 820,
         "wires": []
     },
     {
@@ -262,69 +260,34 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 690,
-        "y": 820,
+        "x": 810,
+        "y": 860,
         "wires": []
     },
     {
-        "id": "0b7b303e8658b7e5",
-        "type": "debug",
+        "id": "8d96462219076cd8",
+        "type": "inject",
         "z": "73619a0e20b766b0",
-        "name": "Write stdout",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "x": 2090,
-        "y": 920,
-        "wires": []
-    },
-    {
-        "id": "7316b9a11ecd1b87",
-        "type": "debug",
-        "z": "73619a0e20b766b0",
-        "name": "Write stderr",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "x": 2090,
-        "y": 960,
-        "wires": []
-    },
-    {
-        "id": "d508ef3e520866ee",
-        "type": "debug",
-        "z": "73619a0e20b766b0",
-        "name": "Write RC",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "x": 2080,
+        "name": "Update Display (every second)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "2",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "",
+        "payload": "update_display",
+        "payloadType": "str",
+        "x": 330,
         "y": 1000,
-        "wires": []
-    },
-    {
-        "id": "02785858b756d613",
-        "type": "debug",
-        "z": "73619a0e20b766b0",
-        "name": "Debug Write Command",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "x": 1890,
-        "y": 880,
-        "wires": []
+        "wires": [
+            [
+                "1996b9100a3bb7f4"
+            ]
+        ]
     },
     {
         "id": "1996b9100a3bb7f4",
@@ -338,8 +301,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1270,
-        "y": 940,
+        "x": 1390,
+        "y": 980,
         "wires": [
             [
                 "cd04a40c673c7eee"
@@ -350,119 +313,22 @@
         ]
     },
     {
-        "id": "297a65f921de75d9",
-        "type": "rpi-gpio in",
+        "id": "cd04a40c673c7eee",
+        "type": "template",
         "z": "73619a0e20b766b0",
-        "name": "Mode Switch Button",
-        "pin": "16",
-        "intype": "up",
-        "debounce": "100",
-        "read": false,
-        "bcm": true,
-        "x": 180,
-        "y": 1040,
+        "name": "Build Write Command",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": " --line \"{{line}}\" --message \"{{payload}}\"",
+        "output": "str",
+        "x": 1700,
+        "y": 980,
         "wires": [
             [
-                "172f611c7655f1aa",
-                "4099fe7620e04b1d"
-            ]
-        ]
-    },
-    {
-        "id": "172f611c7655f1aa",
-        "type": "function",
-        "z": "73619a0e20b766b0",
-        "name": "Cycle Through Weather Modes",
-        "func": "// Only process when button is pressed (rising edge)\nif (msg.payload !== 1) return null;\n\n// Only cycle weather modes if we're in weather display mode\nconst switchesMode = flow.get('switches_mode') || 'time';\nif (switchesMode !== 'weather') {\n    // We're not in weather mode, so button does nothing\n    return null;\n}\n\n// Get current mode\nconst currentMode = flow.get('weather_mode') || 'temperature';\n\n// Define the cycle order - limited to just 4 essential modes\nconst modes = ['temperature', 'humidity', 'wind', 'description'];\n\n// Track button press count to prevent excessive cycling\nlet pressCount = flow.get('button_press_count') || 0;\npressCount++;\n\n// Store press count for debouncing purposes\nflow.set('button_press_count', pressCount);\nflow.set('last_button_press', Date.now());\n\n// Find current index\nlet currentIndex = modes.indexOf(currentMode);\n\n// If current mode not found in array, default to first mode\nif (currentIndex === -1) currentIndex = 0;\n\n// Move to next mode (or back to first if at end)\n// This ensures limited cycling through only 4 modes\nlet nextIndex = (currentIndex + 1) % modes.length;\n\n// Set the next mode\nconst nextMode = modes[nextIndex];\nflow.set('weather_mode', nextMode);\nmsg.payload = nextMode;\n\n// Also log mode change\nnode.log(\"Weather display mode changed to: \" + nextMode + \" (press #\" + pressCount + \")\");\n\n// Return the message with the new mode\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 640,
-        "y": 1040,
-        "wires": [
-            [
-                "1996b9100a3bb7f4",
-                "e0337f99aca4f801"
-            ]
-        ]
-    },
-    {
-        "id": "4099fe7620e04b1d",
-        "type": "debug",
-        "z": "73619a0e20b766b0",
-        "name": "Button Press",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 380,
-        "y": 1080,
-        "wires": []
-    },
-    {
-        "id": "e0337f99aca4f801",
-        "type": "debug",
-        "z": "73619a0e20b766b0",
-        "name": "Mode Changed",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 910,
-        "y": 1040,
-        "wires": []
-    },
-    {
-        "id": "33bac39479946e4c",
-        "type": "inject",
-        "z": "73619a0e20b766b0",
-        "name": "Error Recovery (every hour)",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "3600",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0,
-        "topic": "",
-        "payload": "check",
-        "payloadType": "str",
-        "x": 220,
-        "y": 720,
-        "wires": [
-            [
-                "1d5642a82f5f8ae0"
-            ]
-        ]
-    },
-    {
-        "id": "1d5642a82f5f8ae0",
-        "type": "function",
-        "z": "73619a0e20b766b0",
-        "name": "Check Last Update Time",
-        "func": "// Get last update timestamp\nconst lastUpdated = flow.get('last_updated') || 0;\nconst now = Date.now();\n\n// If no update in the last 20 minutes (1200000ms), force refresh\nif (now - lastUpdated > 1200000) {\n    node.warn(\"No weather updates for 20+ minutes. Forcing refresh.\");\n    // Set payload to trigger a new weather fetch\n    msg.payload = Date.now();\n    return msg;\n}\n\n// Otherwise no need to do anything\nreturn null;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 460,
-        "y": 720,
-        "wires": [
-            [
-                "b3cfd559401f9bfa"
+                "37d4dde3f2ade25d",
+                "02785858b756d613"
             ]
         ]
     },
@@ -483,13 +349,172 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 1490,
-        "y": 1020,
+        "x": 1610,
+        "y": 1060,
         "wires": [
             [
                 "cd04a40c673c7eee"
             ]
         ]
+    },
+    {
+        "id": "37d4dde3f2ade25d",
+        "type": "exec",
+        "z": "73619a0e20b766b0",
+        "command": "python /home/star2050/digilab/lcd/write.py",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Run Write Script",
+        "x": 1980,
+        "y": 980,
+        "wires": [
+            [
+                "0b7b303e8658b7e5"
+            ],
+            [
+                "7316b9a11ecd1b87"
+            ],
+            [
+                "d508ef3e520866ee"
+            ]
+        ]
+    },
+    {
+        "id": "02785858b756d613",
+        "type": "debug",
+        "z": "73619a0e20b766b0",
+        "name": "Debug Write Command",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 2010,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "0b7b303e8658b7e5",
+        "type": "debug",
+        "z": "73619a0e20b766b0",
+        "name": "Write stdout",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 2210,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "7316b9a11ecd1b87",
+        "type": "debug",
+        "z": "73619a0e20b766b0",
+        "name": "Write stderr",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 2210,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "d508ef3e520866ee",
+        "type": "debug",
+        "z": "73619a0e20b766b0",
+        "name": "Write RC",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 2200,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "297a65f921de75d9",
+        "type": "rpi-gpio in",
+        "z": "73619a0e20b766b0",
+        "name": "Mode Switch Button",
+        "pin": "16",
+        "intype": "up",
+        "debounce": "100",
+        "read": false,
+        "bcm": true,
+        "x": 300,
+        "y": 1080,
+        "wires": [
+            [
+                "172f611c7655f1aa",
+                "4099fe7620e04b1d"
+            ]
+        ]
+    },
+    {
+        "id": "172f611c7655f1aa",
+        "type": "function",
+        "z": "73619a0e20b766b0",
+        "name": "Cycle Through Weather Modes",
+        "func": "// Only process when button is pressed (rising edge)\nif (msg.payload !== 1) return null;\n\n// Only cycle weather modes if we're in weather display mode\nconst switchesMode = flow.get('switches_mode') || 'time';\nif (switchesMode !== 'weather') {\n    // We're not in weather mode, so button does nothing\n    return null;\n}\n\n// Get current mode\nconst currentMode = flow.get('weather_mode') || 'temperature';\n\n// Define the cycle order - limited to just 4 essential modes\nconst modes = ['temperature', 'humidity', 'wind', 'description'];\n\n// Track button press count to prevent excessive cycling\nlet pressCount = flow.get('button_press_count') || 0;\npressCount++;\n\n// Store press count for debouncing purposes\nflow.set('button_press_count', pressCount);\nflow.set('last_button_press', Date.now());\n\n// Find current index\nlet currentIndex = modes.indexOf(currentMode);\n\n// If current mode not found in array, default to first mode\nif (currentIndex === -1) currentIndex = 0;\n\n// Move to next mode (or back to first if at end)\n// This ensures limited cycling through only 4 modes\nlet nextIndex = (currentIndex + 1) % modes.length;\n\n// Set the next mode\nconst nextMode = modes[nextIndex];\nflow.set('weather_mode', nextMode);\nmsg.payload = nextMode;\n\n// Also log mode change\nnode.log(\"Weather display mode changed to: \" + nextMode + \" (press #\" + pressCount + \")\");\n\n// Return the message with the new mode\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 1080,
+        "wires": [
+            [
+                "1996b9100a3bb7f4",
+                "e0337f99aca4f801"
+            ]
+        ]
+    },
+    {
+        "id": "4099fe7620e04b1d",
+        "type": "debug",
+        "z": "73619a0e20b766b0",
+        "name": "Button Press",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 500,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "e0337f99aca4f801",
+        "type": "debug",
+        "z": "73619a0e20b766b0",
+        "name": "Mode Changed",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1030,
+        "y": 1080,
+        "wires": []
     },
     {
         "id": "789c0aec48a6fb3d",
@@ -501,8 +526,8 @@
         "debounce": "25",
         "read": false,
         "bcm": true,
-        "x": 170,
-        "y": 1180,
+        "x": 290,
+        "y": 1220,
         "wires": [
             [
                 "b63af0586ec5ebf7"
@@ -519,8 +544,8 @@
         "debounce": "25",
         "read": false,
         "bcm": true,
-        "x": 170,
-        "y": 1240,
+        "x": 290,
+        "y": 1280,
         "wires": [
             [
                 "b63af0586ec5ebf7"
@@ -539,8 +564,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 430,
-        "y": 1210,
+        "x": 550,
+        "y": 1250,
         "wires": [
             [
                 "1996b9100a3bb7f4",
@@ -561,63 +586,38 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 690,
-        "y": 1210,
+        "x": 810,
+        "y": 1250,
         "wires": []
-    },
-    {
-        "id": "8d96462219076cd8",
-        "type": "inject",
-        "z": "73619a0e20b766b0",
-        "name": "Update Display (every second)",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "10",
-        "crontab": "",
-        "once": true,
-        "onceDelay": "2",
-        "topic": "",
-        "payload": "update_display",
-        "payloadType": "str",
-        "x": 210,
-        "y": 960,
-        "wires": [
-            [
-                "1996b9100a3bb7f4"
-            ]
-        ]
     },
     {
         "id": "7cc62c26b68a04ba",
         "type": "comment",
         "z": "73619a0e20b766b0",
-        "name": "Weather Display Section",
+        "name": "WEATHER DATA SECTION",
         "info": "",
-        "x": 210,
-        "y": 560,
+        "x": 330,
+        "y": 600,
         "wires": []
     },
     {
         "id": "354130156739c815",
         "type": "comment",
         "z": "73619a0e20b766b0",
-        "name": "LCD Display Handler Section",
+        "name": "LCD DISPLAY HANDLER SECTION",
         "info": "",
-        "x": 220,
-        "y": 1000,
+        "x": 340,
+        "y": 940,
         "wires": []
     },
     {
         "id": "310a38239b5a85ec",
         "type": "comment",
         "z": "73619a0e20b766b0",
-        "name": "Switch Input Section",
+        "name": "SWITCH INPUT SECTION",
         "info": "",
-        "x": 190,
-        "y": 1140,
+        "x": 310,
+        "y": 1180,
         "wires": []
     },
     {
