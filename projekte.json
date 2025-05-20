@@ -534,6 +534,7 @@
         "name": "Process Switch Changes",
         "func": "// Store switch states in context\nif (msg.topic === 'schalter1') {\n    flow.set('switch1', msg.payload);\n} else if (msg.topic === 'schalter2') {\n    flow.set('switch2', msg.payload);\n}\n\n// Get current states (default to 0 if not set)\nconst switch1 = flow.get('switch1') || 0;\nconst switch2 = flow.get('switch2') || 0;\n\n// Determine mode based on switch positions\nlet mode;\nif (switch1 === 0 && switch2 === 0) {\n    mode = 'time';       // Both OFF - Show Time\n} else if (switch1 === 1 && switch2 === 0) {\n    mode = 'weather';    // Switch 1 ON, Switch 2 OFF - Show Weather\n} else if (switch1 === 0 && switch2 === 1) {\n    mode = 'system';     // Switch 1 OFF, Switch 2 ON - Show System Info\n} else if (switch1 === 1 && switch2 === 1) {\n    mode = 'custom';     // Both ON - Show Custom Message\n} else {\n    mode = 'time';       // Default fallback\n}\n\n// Only update if mode has changed\nconst currentMode = flow.get('switches_mode');\nif (mode !== currentMode) {\n    flow.set('switches_mode', mode);\n    node.log(\"Display mode changed to: \" + mode);\n    \n    // Prepare message to trigger display update\n    msg.payload = mode;\n    msg.topic = 'mode_change';\n    return msg;\n}\n\nreturn null;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -574,7 +575,7 @@
                 "p": "payload"
             }
         ],
-        "repeat": "1",
+        "repeat": "2",
         "crontab": "",
         "once": true,
         "onceDelay": "2",
