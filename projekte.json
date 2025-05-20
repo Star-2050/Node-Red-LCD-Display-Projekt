@@ -274,10 +274,10 @@
                 "p": "payload"
             }
         ],
-        "repeat": "2",
+        "repeat": "3",
         "crontab": "",
         "once": true,
-        "onceDelay": "2",
+        "onceDelay": "3",
         "topic": "",
         "payload": "update_display",
         "payloadType": "str",
