@@ -186,7 +186,7 @@
         "syntax": "mustache",
         "template": " --line \"{{line}}\" --message \"{{payload}}\"",
         "output": "str",
-        "x": 1390,
+        "x": 1580,
         "y": 940,
         "wires": [
             [
@@ -207,7 +207,7 @@
         "winHide": false,
         "oldrc": false,
         "name": "Run Write Script",
-        "x": 1650,
+        "x": 1860,
         "y": 940,
         "wires": [
             [
@@ -277,7 +277,7 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 1880,
+        "x": 2090,
         "y": 920,
         "wires": []
     },
@@ -292,7 +292,7 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 1880,
+        "x": 2090,
         "y": 960,
         "wires": []
     },
@@ -307,7 +307,7 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 1870,
+        "x": 2080,
         "y": 1000,
         "wires": []
     },
@@ -322,7 +322,7 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 1680,
+        "x": 1890,
         "y": 880,
         "wires": []
     },
@@ -338,8 +338,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1010,
-        "y": 780,
+        "x": 1270,
+        "y": 940,
         "wires": [
             [
                 "cd04a40c673c7eee"
@@ -359,8 +359,8 @@
         "debounce": "100",
         "read": false,
         "bcm": true,
-        "x": 190,
-        "y": 920,
+        "x": 180,
+        "y": 1040,
         "wires": [
             [
                 "172f611c7655f1aa",
@@ -379,8 +379,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 650,
-        "y": 920,
+        "x": 640,
+        "y": 1040,
         "wires": [
             [
                 "1996b9100a3bb7f4",
@@ -401,8 +401,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 390,
-        "y": 960,
+        "x": 380,
+        "y": 1080,
         "wires": []
     },
     {
@@ -418,8 +418,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 920,
-        "y": 920,
+        "x": 910,
+        "y": 1040,
         "wires": []
     },
     {
@@ -472,7 +472,7 @@
         "z": "73619a0e20b766b0",
         "name": "",
         "pauseType": "delay",
-        "timeout": "500",
+        "timeout": "200",
         "timeoutUnits": "milliseconds",
         "rate": "1",
         "nbRateUnits": "1",
@@ -483,8 +483,8 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 1250,
-        "y": 820,
+        "x": 1490,
+        "y": 1020,
         "wires": [
             [
                 "cd04a40c673c7eee"
@@ -501,8 +501,8 @@
         "debounce": "25",
         "read": false,
         "bcm": true,
-        "x": 180,
-        "y": 1060,
+        "x": 170,
+        "y": 1180,
         "wires": [
             [
                 "b63af0586ec5ebf7"
@@ -519,8 +519,8 @@
         "debounce": "25",
         "read": false,
         "bcm": true,
-        "x": 180,
-        "y": 1120,
+        "x": 170,
+        "y": 1240,
         "wires": [
             [
                 "b63af0586ec5ebf7"
@@ -538,8 +538,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 440,
-        "y": 1090,
+        "x": 430,
+        "y": 1210,
         "wires": [
             [
                 "1996b9100a3bb7f4",
@@ -560,8 +560,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 700,
-        "y": 1090,
+        "x": 690,
+        "y": 1210,
         "wires": []
     },
     {
@@ -581,8 +581,8 @@
         "topic": "",
         "payload": "update_display",
         "payloadType": "str",
-        "x": 220,
-        "y": 840,
+        "x": 210,
+        "y": 960,
         "wires": [
             [
                 "1996b9100a3bb7f4"
@@ -605,8 +605,8 @@
         "z": "73619a0e20b766b0",
         "name": "LCD Display Handler Section",
         "info": "",
-        "x": 230,
-        "y": 880,
+        "x": 220,
+        "y": 1000,
         "wires": []
     },
     {
@@ -615,8 +615,8 @@
         "z": "73619a0e20b766b0",
         "name": "Switch Input Section",
         "info": "",
-        "x": 200,
-        "y": 1020,
+        "x": 190,
+        "y": 1140,
         "wires": []
     },
     {
