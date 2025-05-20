@@ -32,8 +32,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 190,
-        "y": 720,
+        "x": 170,
+        "y": 700,
         "wires": [
             [
                 "b3cfd559401f9bfa"
@@ -56,8 +56,8 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 460,
-        "y": 720,
+        "x": 440,
+        "y": 700,
         "wires": [
             [
                 "733d598a4f7b149d",
@@ -78,8 +78,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 470,
-        "y": 660,
+        "x": 450,
+        "y": 640,
         "wires": []
     },
     {
@@ -94,8 +94,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 690,
-        "y": 720,
+        "x": 670,
+        "y": 700,
         "wires": [
             [
                 "1996b9100a3bb7f4",
@@ -116,8 +116,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 750,
-        "y": 660,
+        "x": 730,
+        "y": 640,
         "wires": []
     },
     {
@@ -137,8 +137,8 @@
         "topic": "",
         "payload": "check",
         "payloadType": "str",
-        "x": 220,
-        "y": 780,
+        "x": 200,
+        "y": 760,
         "wires": [
             [
                 "1d5642a82f5f8ae0"
@@ -156,8 +156,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 460,
-        "y": 780,
+        "x": 440,
+        "y": 760,
         "wires": [
             [
                 "b3cfd559401f9bfa"
@@ -170,8 +170,8 @@
         "z": "73619a0e20b766b0",
         "name": "WEATHER DATA SECTION",
         "info": "",
-        "x": 210,
-        "y": 620,
+        "x": 190,
+        "y": 600,
         "wires": []
     },
     {
@@ -195,8 +195,8 @@
         "once": true,
         "onceDelay": "1",
         "topic": "init",
-        "x": 220,
-        "y": 840,
+        "x": 200,
+        "y": 820,
         "wires": [
             [
                 "d72a326f373d8fc1"
@@ -215,8 +215,8 @@
         "winHide": false,
         "oldrc": false,
         "name": "Run Init/Clear Script",
-        "x": 470,
-        "y": 840,
+        "x": 450,
+        "y": 820,
         "wires": [
             [
                 "21f554a9c2ef9cce"
@@ -240,8 +240,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 700,
-        "y": 800,
+        "x": 680,
+        "y": 780,
         "wires": []
     },
     {
@@ -255,8 +255,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 700,
-        "y": 840,
+        "x": 680,
+        "y": 820,
         "wires": []
     },
     {
@@ -270,8 +270,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 690,
-        "y": 880,
+        "x": 670,
+        "y": 860,
         "wires": []
     },
     {
@@ -280,8 +280,8 @@
         "z": "73619a0e20b766b0",
         "name": "LCD DISPLAY SECTION",
         "info": "",
-        "x": 220,
-        "y": 960,
+        "x": 200,
+        "y": 940,
         "wires": []
     },
     {
@@ -301,8 +301,8 @@
         "topic": "",
         "payload": "update_display",
         "payloadType": "str",
-        "x": 210,
-        "y": 1020,
+        "x": 190,
+        "y": 1000,
         "wires": [
             [
                 "1996b9100a3bb7f4"
@@ -314,15 +314,15 @@
         "type": "function",
         "z": "73619a0e20b766b0",
         "name": "Update Display Based on Mode",
-        "func": "// Get current switches mode\nconst switchesMode = flow.get('switches_mode') || 'time';\n\n// Get weather display mode (only applies when in weather mode)\nconst weatherMode = flow.get('weather_mode') || 'temperature';\n\n// Get data from flow context\nconst temperature = flow.get('temperature') || 'N/A';\nconst humidity = flow.get('humidity') || 'N/A';\nconst wind = flow.get('wind') || 'N/A';\nconst description = flow.get('description') || 'N/A';\nconst city = flow.get('city') || 'Connecting...';\n\n// Time-specific data\nconst now = new Date();\nconst hours = now.getHours();\nconst minutes = now.getMinutes();\nconst seconds = now.getSeconds();\nconst timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;\nconst dateStr = now.toLocaleDateString('de-DE');\n\n// Clean function to remove/replace problematic characters\nfunction cleanText(text) {\n    if (typeof text !== 'string') return 'N/A';\n    \n    // Replace HTML entities and problematic characters\n    return text\n        .replace(/&#x2F;/g, '|')         // Replace HTML entity for slash\n        .replace(/&#(\\d+);/g, '')        // Remove all other HTML entities\n        .replace(/[^\\x20-\\x7E]/g, '')    // Keep only basic ASCII characters\n        .replace(/[^\\w\\s.,°%\\/-:]/g, ''); // Keep only alphanumeric, spaces, and some symbols\n}\n\n// Ensure values are strings and limit to display width (16 chars for standard LCD)\nfunction formatForDisplay(text, maxLength = 16) {\n    let cleaned = cleanText(String(text));\n    return cleaned.length > maxLength ? cleaned.substring(0, maxLength) : cleaned;\n}\n\n// Clean all displayed text\nconst cleanCity = formatForDisplay(city);\nconst cleanTemp = formatForDisplay(temperature);\nconst cleanHumidity = formatForDisplay(humidity);\nconst cleanWind = formatForDisplay(wind);\nconst cleanTimeStr = formatForDisplay(timeStr);\nconst cleanDateStr = formatForDisplay(dateStr);\n\n// Special formatting for description - capitalize first letter\nlet cleanDescription = formatForDisplay(description);\nif (cleanDescription.length > 0) {\n    cleanDescription = cleanDescription.charAt(0).toUpperCase() + cleanDescription.slice(1);\n}\n\n// Prepare messages for line 1 and 2\nlet line1;\nlet line2;\n\n// Mode 1: Time display (both switches OFF)\nif (switchesMode === 'time') {\n    line1 = { payload: \"Datum : \"+cleanDateStr, line: 1 };\n    line2 = { payload:  cleanTimeStr, line: 2 };\n}\n// Mode 2: Weather display (switch 1 ON, switch 2 OFF)\nelse if (switchesMode === 'weather') {\n    // Sub-modes for weather display based on weatherMode\n    switch(weatherMode) {\n        case 'temperature':\n            line1 = { payload: \"Temperatur\", line: 1 };\n            line2 = { payload: cleanTemp, line: 2 };\n            break;\n        case 'humidity':\n            line1 = { payload: \"Luftfeuchtigkeit\", line: 1 };\n            line2 = { payload: cleanHumidity, line: 2 };\n            break;\n        case 'wind':\n            line1 = { payload: \"Windgeschwindigk.\", line: 1 };\n            line2 = { payload: cleanWind, line: 2 };\n            break;\n        case 'description':\n            line1 = { payload: \"Wetterlage\", line: 1 };\n            line2 = { payload: cleanDescription, line: 2 };\n            break;\n        default:\n            line1 = { payload: \"Temperatur\", line: 1 };\n            line2 = { payload: cleanTemp, line: 2 };\n    }\n}\n// Mode 3: System info (switch 1 OFF, switch 2 ON)\nelse if (switchesMode === 'system') {\n    // Get uptime using 'uptime' command\n    const execSync = require('child_process').execSync;\n    let systemInfo;\n    try {\n        // Try to get system info\n        systemInfo = \"System aktiv\";\n    } catch (e) {\n        systemInfo = \"System Info N/A\";\n    }\n    \n    line1 = { payload: \"System Info\", line: 1 };\n    line2 = { payload: formatForDisplay(systemInfo), line: 2 };\n}\n\n// Mode 4: Custom message (both switches ON)\nelse if (switchesMode === 'custom') {\n    line1 = { payload: \"Benutzerdefiniert\", line: 1 };\n    line2 = { payload: \"Hallo Welt!\", line: 2 };\n}\n// Default fallback to time display\nelse {\n    line1 = { payload: \"Datum\", line: 1 };\n    line2 = { payload: cleanDateStr + \" \" + cleanTimeStr, line: 2 };\n}\n\n// Return both messages as array\nreturn [line1, line2];",
+        "func": "// Get current switches mode\nconst switchesMode = flow.get('switches_mode') || 'time';\n\n// DEBUG mode\nnode.log(\"DISPLAY HANDLER - Current mode: \" + switchesMode);\n\n// Get weather display mode (only applies when in weather mode)\nconst weatherMode = flow.get('weather_mode') || 'temperature';\n\n// Get data from flow context\nconst temperature = flow.get('temperature') || 'N/A';\nconst humidity = flow.get('humidity') || 'N/A';\nconst wind = flow.get('wind') || 'N/A';\nconst description = flow.get('description') || 'N/A';\nconst city = flow.get('city') || 'Connecting...';\n\n// Time-specific data\nconst now = new Date();\nconst hours = now.getHours();\nconst minutes = now.getMinutes();\nconst seconds = now.getSeconds();\nconst timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;\nconst dateStr = now.toLocaleDateString('de-DE');\n\n// Clean function to remove/replace problematic characters\nfunction cleanText(text) {\n    if (typeof text !== 'string') return 'N/A';\n    \n    // Replace HTML entities and problematic characters\n    return text\n        .replace(/&#x2F;/g, '|')         // Replace HTML entity for slash\n        .replace(/&#(\\d+);/g, '')        // Remove all other HTML entities\n        .replace(/[^\\x20-\\x7E]/g, '')    // Keep only basic ASCII characters\n        .replace(/[^\\w\\s.,°%\\/-:]/g, ''); // Keep only alphanumeric, spaces, and some symbols\n}\n\n// Ensure values are strings and limit to display width (16 chars for standard LCD)\nfunction formatForDisplay(text, maxLength = 16) {\n    let cleaned = cleanText(String(text));\n    return cleaned.length > maxLength ? cleaned.substring(0, maxLength) : cleaned;\n}\n\n// Clean all displayed text\nconst cleanCity = formatForDisplay(city);\nconst cleanTemp = formatForDisplay(temperature);\nconst cleanHumidity = formatForDisplay(humidity);\nconst cleanWind = formatForDisplay(wind);\nconst cleanTimeStr = formatForDisplay(timeStr);\nconst cleanDateStr = formatForDisplay(dateStr);\n\n// Special formatting for description - capitalize first letter\nlet cleanDescription = formatForDisplay(description);\nif (cleanDescription.length > 0) {\n    cleanDescription = cleanDescription.charAt(0).toUpperCase() + cleanDescription.slice(1);\n}\n\n// Prepare messages for line 1 and 2\nlet line1;\nlet line2;\n\n// Mode 1: Time display (both switches OFF)\nif (switchesMode === 'time') {\n    line1 = { payload: \"Datum : \"+cleanDateStr, line: 1 };\n    line2 = { payload:  cleanTimeStr, line: 2 };\n    node.log(\"Display set to TIME mode\");\n}\n// Mode 2: Weather display (switch 1 ON, switch 2 OFF)\nelse if (switchesMode === 'weather') {\n    // Sub-modes for weather display based on weatherMode\n    node.log(\"Display set to WEATHER mode, sub-mode: \" + weatherMode);\n    switch(weatherMode) {\n        case 'temperature':\n            line1 = { payload: \"Temperatur\", line: 1 };\n            line2 = { payload: cleanTemp, line: 2 };\n            break;\n        case 'humidity':\n            line1 = { payload: \"Luftfeuchtigkeit\", line: 1 };\n            line2 = { payload: cleanHumidity, line: 2 };\n            break;\n        case 'wind':\n            line1 = { payload: \"Windgeschwindigk.\", line: 1 };\n            line2 = { payload: cleanWind, line: 2 };\n            break;\n        case 'description':\n            line1 = { payload: \"Wetterlage\", line: 1 };\n            line2 = { payload: cleanDescription, line: 2 };\n            break;\n        default:\n            line1 = { payload: \"Temperatur\", line: 1 };\n            line2 = { payload: cleanTemp, line: 2 };\n    }\n}\n// Mode 3: System info (switch 1 OFF, switch 2 ON)\nelse if (switchesMode === 'system') {\n    // Get uptime using 'uptime' command\n    node.log(\"Display set to SYSTEM mode\");\n    const execSync = require('child_process').execSync;\n    let systemInfo;\n    try {\n        // Try to get system info\n        systemInfo = \"System aktiv\";\n    } catch (e) {\n        systemInfo = \"System Info N/A\";\n    }\n    \n    line1 = { payload: \"System Info\", line: 1 };\n    line2 = { payload: formatForDisplay(systemInfo), line: 2 };\n}\n\n// Mode 4: Custom message (both switches ON)\nelse if (switchesMode === 'custom') {\n    node.log(\"Display set to CUSTOM mode\");\n    line1 = { payload: \"Benutzerdefiniert\", line: 1 };\n    line2 = { payload: \"Hallo Welt!\", line: 2 };\n}\n// Default fallback to time display\nelse {\n    node.warn(\"Unknown mode: \" + switchesMode + \", defaulting to TIME\");\n    line1 = { payload: \"Datum\", line: 1 };\n    line2 = { payload: cleanDateStr + \" \" + cleanTimeStr, line: 2 };\n}\n\n// Return both messages as array\nreturn [line1, line2];",
         "outputs": 2,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1270,
-        "y": 1000,
+        "x": 1250,
+        "y": 980,
         "wires": [
             [
                 "cd04a40c673c7eee"
@@ -343,8 +343,8 @@
         "syntax": "mustache",
         "template": " --line \"{{line}}\" --message \"{{payload}}\"",
         "output": "str",
-        "x": 1580,
-        "y": 1000,
+        "x": 1560,
+        "y": 980,
         "wires": [
             [
                 "37d4dde3f2ade25d",
@@ -369,8 +369,8 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 1490,
-        "y": 1080,
+        "x": 1470,
+        "y": 1060,
         "wires": [
             [
                 "cd04a40c673c7eee"
@@ -389,8 +389,8 @@
         "winHide": false,
         "oldrc": false,
         "name": "Run Write Script",
-        "x": 1860,
-        "y": 1000,
+        "x": 1840,
+        "y": 980,
         "wires": [
             [
                 "0b7b303e8658b7e5"
@@ -414,8 +414,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 1890,
-        "y": 940,
+        "x": 1870,
+        "y": 920,
         "wires": []
     },
     {
@@ -429,8 +429,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 2090,
-        "y": 980,
+        "x": 2070,
+        "y": 960,
         "wires": []
     },
     {
@@ -444,8 +444,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 2090,
-        "y": 1020,
+        "x": 2070,
+        "y": 1000,
         "wires": []
     },
     {
@@ -459,8 +459,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 2080,
-        "y": 1060,
+        "x": 2060,
+        "y": 1040,
         "wires": []
     },
     {
@@ -469,8 +469,8 @@
         "z": "73619a0e20b766b0",
         "name": "SWITCH INPUT SECTION",
         "info": "",
-        "x": 190,
-        "y": 1200,
+        "x": 170,
+        "y": 1180,
         "wires": []
     },
     {
@@ -483,8 +483,8 @@
         "debounce": "100",
         "read": false,
         "bcm": true,
-        "x": 180,
-        "y": 1100,
+        "x": 160,
+        "y": 1080,
         "wires": [
             [
                 "172f611c7655f1aa",
@@ -503,8 +503,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 640,
-        "y": 1100,
+        "x": 620,
+        "y": 1080,
         "wires": [
             [
                 "1996b9100a3bb7f4",
@@ -525,8 +525,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 380,
-        "y": 1140,
+        "x": 360,
+        "y": 1120,
         "wires": []
     },
     {
@@ -542,22 +542,22 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 910,
-        "y": 1100,
+        "x": 890,
+        "y": 1080,
         "wires": []
     },
     {
         "id": "789c0aec48a6fb3d",
         "type": "rpi-gpio in",
         "z": "73619a0e20b766b0",
-        "name": "switch2",
+        "name": "Schalter 2",
         "pin": "20",
-        "intype": "tri",
-        "debounce": "25",
-        "read": false,
+        "intype": "up",
+        "debounce": "50",
+        "read": true,
         "bcm": true,
-        "x": 160,
-        "y": 1240,
+        "x": 150,
+        "y": 1220,
         "wires": [
             [
                 "b63af0586ec5ebf7"
@@ -568,14 +568,14 @@
         "id": "3c5df00822c9a005",
         "type": "rpi-gpio in",
         "z": "73619a0e20b766b0",
-        "name": "switch1",
+        "name": "Schalter 1",
         "pin": "21",
-        "intype": "tri",
-        "debounce": "25",
-        "read": false,
+        "intype": "up",
+        "debounce": "50",
+        "read": true,
         "bcm": true,
-        "x": 160,
-        "y": 1300,
+        "x": 150,
+        "y": 1280,
         "wires": [
             [
                 "b63af0586ec5ebf7"
@@ -587,15 +587,15 @@
         "type": "function",
         "z": "73619a0e20b766b0",
         "name": "Process Switch Changes",
-        "func": "// Store switch states in context\nif (msg.topic === 'schalter1') {\n    flow.set('switch1', msg.payload);\n    node.log(\"Switch 1 state changed to: \" + msg.payload);\n} else if (msg.topic === 'schalter2') {\n    flow.set('switch2', msg.payload);\n    node.log(\"Switch 2 state changed to: \" + msg.payload);\n} else {\n    // If no topic, try to identify by pin\n    node.log(\"No topic in message. Attempting to identify switch by other means.\");\n}\n\n// Get current states (default to 0 if not set)\nconst switch1 = flow.get('switch1') /*|| 0*/;\nconst switch2 = flow.get('switch2') /*|| 0*/;\n\n// Debug\nnode.log(\"Current switch states - Switch1: \" + switch1 + \", Switch2: \" + switch2);\n\n// Determine mode based on switch positions\nlet mode;\nif (switch1 == 0 && switch2 == 0) {\n    mode = 'time';       // Both OFF - Show Time\n} else if (switch1 == 1 && switch2 == 0) {\n    mode = 'weather';    // Switch 1 ON, Switch 2 OFF - Show Weather\n} else if (switch1 == 0 && switch2 == 1) {\n    mode = 'system';     // Switch 1 OFF, Switch 2 ON - Show System Info\n} else if (switch1 == 1 && switch2 == 1) {\n    mode = 'custom';     // Both ON - Show Custom Message\n} else {\n    mode = 'time';       // Default fallback\n}\n\n// Only update if mode has changed\nconst currentMode = flow.get('switches_mode');\nnode.log(\"Current mode: \" + currentMode + \", New mode: \" + mode);\n\n// Update mode regardless of change to ensure it's set correctly\nflow.set('switches_mode', mode);\nnode.log(\"Display mode set to: \" + mode);\n\n// Prepare message to trigger display update\nmsg.payload = mode;\nmsg.topic = 'mode_change';\nreturn msg;",
+        "func": "// Debug incoming message\nnode.log(\"Received message: \" + JSON.stringify({topic: msg.topic, payload: msg.payload}));\n\n// Store switch states in context\nif (msg.topic === 'schalter1') {\n    // Invert logic if needed - physical switches might be reversed\n    // 0 becomes 1, 1 becomes 0\n    const switchState = msg.payload === 0 ? 1 : 0;\n    flow.set('switch1', switchState);\n    node.log(\"Switch 1 state set to: \" + switchState + \" (original: \" + msg.payload + \")\");\n} else if (msg.topic === 'schalter2') {\n    const switchState = msg.payload === 0 ? 1 : 0;\n    flow.set('switch2', switchState);\n    node.log(\"Switch 2 state set to: \" + switchState + \" (original: \" + msg.payload + \")\");\n} else {\n    // No topic, but still record\n    node.log(\"Unknown switch message: \" + JSON.stringify(msg));\n}\n\n// Force-read current states\nconst switch1 = flow.get('switch1');\nconst switch2 = flow.get('switch2');\n\n// Debug current switch states\nnode.log(\"Current switch states - Switch1: \" + switch1 + \", Switch2: \" + switch2);\n\n// Override default mode for testing if needed\n// flow.set('switch1', 1);  // Uncomment to test\n// flow.set('switch2', 0);\n\n// Determine mode based on switch positions\nlet mode;\nif (switch1 === 0 && switch2 === 0) {\n    mode = 'time';       // Both OFF - Show Time\n} else if (switch1 === 1 && switch2 === 0) {\n    mode = 'weather';    // Switch 1 ON, Switch 2 OFF - Show Weather\n} else if (switch1 === 0 && switch2 === 1) {\n    mode = 'system';     // Switch 1 OFF, Switch 2 ON - Show System Info\n} else if (switch1 === 1 && switch2 === 1) {\n    mode = 'custom';     // Both ON - Show Custom Message\n} else {\n    // Default mode if we somehow have undefined values\n    mode = 'time';       \n    node.warn(\"Undefined switch values: S1=\" + switch1 + \", S2=\" + switch2);\n}\n\n// Log the determined mode\nnode.log(\"Determined mode: \" + mode);\n\n// Always update the mode\nflow.set('switches_mode', mode);\n\n// Prepare message to trigger display update\nmsg.payload = mode;\nmsg.topic = 'mode_change';\nreturn msg;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
-        "initialize": "",
+        "initialize": "// Initialize switch states\nflow.set('switch1', 0);\nflow.set('switch2', 0);\nflow.set('switches_mode', 'time');\nnode.log(\"Switch states initialized\");",
         "finalize": "",
         "libs": [],
-        "x": 430,
-        "y": 1270,
+        "x": 410,
+        "y": 1250,
         "wires": [
             [
                 "1996b9100a3bb7f4",
@@ -616,8 +616,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 690,
-        "y": 1270,
+        "x": 670,
+        "y": 1250,
         "wires": []
     },
     {
