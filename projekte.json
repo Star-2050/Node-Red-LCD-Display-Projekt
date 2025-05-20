@@ -770,31 +770,7 @@
         "y": 1380,
         "wires": [
             [
-                "4dc88d47b438f970"
-            ]
-        ]
-    },
-    {
-        "id": "4dc88d47b438f970",
-        "type": "http request",
-        "z": "73619a0e20b766b0",
-        "name": "Abruf Aktiendaten",
-        "method": "GET",
-        "ret": "obj",
-        "paytoqs": "ignore",
-        "url": "https://finnhub.io/api/v1/quote?symbol=AAPL&token=d0m7gmpr01qkesvj2im0d0m7gmpr01qkesvj2img",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "",
-        "senderr": false,
-        "headers": [],
-        "x": 950,
-        "y": 1380,
-        "wires": [
-            [
-                "36b0baf81d79c4cc"
+                "fetch_stock_data"
             ]
         ]
     },
@@ -919,6 +895,30 @@
         "wires": [
             [
                 "1996b9100a3bb7f4"
+            ]
+        ]
+    },
+    {
+        "id": "fetch_stock_data",
+        "type": "http request",
+        "z": "73619a0e20b766b0",
+        "name": "Abruf Aktiendaten",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://finnhub.io/api/v1/quote?symbol=AAPL&token=d0m7gmpr01qkesvj2im0d0m7gmpr01qkesvj2img",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 950,
+        "y": 1380,
+        "wires": [
+            [
+                "36b0baf81d79c4cc"
             ]
         ]
     },
