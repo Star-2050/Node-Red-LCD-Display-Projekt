@@ -550,13 +550,13 @@
         "id": "789c0aec48a6fb3d",
         "type": "rpi-gpio in",
         "z": "73619a0e20b766b0",
-        "name": "Schalter 2",
+        "name": "switch2",
         "pin": "20",
         "intype": "tri",
         "debounce": "25",
         "read": false,
         "bcm": true,
-        "x": 170,
+        "x": 160,
         "y": 1240,
         "wires": [
             [
@@ -568,13 +568,13 @@
         "id": "3c5df00822c9a005",
         "type": "rpi-gpio in",
         "z": "73619a0e20b766b0",
-        "name": "Schalter 1",
+        "name": "switch1",
         "pin": "21",
         "intype": "tri",
         "debounce": "25",
         "read": false,
         "bcm": true,
-        "x": 170,
+        "x": 160,
         "y": 1300,
         "wires": [
             [
