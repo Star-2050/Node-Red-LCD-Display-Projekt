@@ -621,6 +621,21 @@
         "wires": []
     },
     {
+        "id": "43a38d7f2abab65b",
+        "type": "catch",
+        "z": "73619a0e20b766b0",
+        "name": "",
+        "scope": null,
+        "uncaught": false,
+        "x": 340,
+        "y": 880,
+        "wires": [
+            [
+                "d72a326f373d8fc1"
+            ]
+        ]
+    },
+    {
         "id": "fb6ee8daa34f356e",
         "type": "inject",
         "z": "fa7e41cd5565ceab",
