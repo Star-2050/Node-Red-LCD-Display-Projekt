@@ -578,8 +578,7 @@
         "y": 1280,
         "wires": [
             [
-                "b63af0586ec5ebf7",
-                "6a9809eb141c6e1e"
+                "b63af0586ec5ebf7"
             ]
         ]
     },
@@ -588,7 +587,7 @@
         "type": "function",
         "z": "73619a0e20b766b0",
         "name": "Process Switch Changes",
-        "func": "// Debug incoming message\nnode.log(\"Received message: \" + JSON.stringify({topic: msg.topic, payload: msg.payload}));\n\n// Store switch states in context\nif (msg.topic === 'schalter1') {\n    // Invert logic if needed - physical switches might be reversed\n    // 0 becomes 1, 1 becomes 0\n    const switchState = msg.payload === 0 ? 1 : 0;\n    flow.set('switch1', switchState);\n    node.log(\"Switch 1 state set to: \" + switchState + \" (original: \" + msg.payload + \")\");\n} else if (msg.topic === 'schalter2') {\n    const switchState = msg.payload === 0 ? 1 : 0;\n    flow.set('switch2', switchState);\n    node.log(\"Switch 2 state set to: \" + switchState + \" (original: \" + msg.payload + \")\");\n} else {\n    // No topic, but still record\n    node.log(\"Unknown switch message: \" + JSON.stringify(msg));\n}\n\n// Force-read current states\nconst switch1 = flow.get('switch1');\nconst switch2 = flow.get('switch2');\n\n// Debug current switch states\nnode.log(\"Current switch states - Switch1: \" + switch1 + \", Switch2: \" + switch2);\n\n// Override default mode for testing if needed\n// flow.set('switch1', 1);  // Uncomment to test\n// flow.set('switch2', 0);\n\n// Determine mode based on switch positions\nlet mode;\nif (switch1 === 0 && switch2 === 0) {\n    mode = 'time';       // Both OFF - Show Time\n} else if (switch1 === 1 && switch2 === 0) {\n    mode = 'weather';    // Switch 1 ON, Switch 2 OFF - Show Weather\n} else if (switch1 === 0 && switch2 === 1) {\n    mode = 'system';     // Switch 1 OFF, Switch 2 ON - Show System Info\n} else if (switch1 === 1 && switch2 === 1) {\n    mode = 'custom';     // Both ON - Show Custom Message\n} else {\n    // Default mode if we somehow have undefined values\n    mode = 'time';       \n    node.warn(\"Undefined switch values: S1=\" + switch1 + \", S2=\" + switch2);\n}\n\n// Log the determined mode\nnode.log(\"Determined mode: \" + mode);\n\n// Always update the mode\nflow.set('switches_mode', mode);\n\n// Prepare message to trigger display update\nmsg.payload = mode;\nmsg.topic = 'mode_change';\nreturn msg;",
+        "func": "// Process input from GPIO pins\n// Check if the message has pin information in the topic\nconst isPinTopic = msg.topic && (msg.topic.includes(\"20\") || msg.topic.includes(\"21\"));\n\n// Store switch states based on pin number or explicit topic\nif (msg.topic === 'schalter1' || (isPinTopic && msg.topic.includes(\"21\"))) {\n    // For pull-up resistors: 0 = pressed/ON, 1 = not pressed/OFF\n    // If using pull-up, logical state is inverse of electrical state\n    flow.set('switch1', msg.payload === 0 ? 1 : 0);\n    node.log(\"Switch 1 set to: \" + flow.get('switch1') + \" (GPIO: \" + msg.payload + \")\");\n} else if (msg.topic === 'schalter2' || (isPinTopic && msg.topic.includes(\"20\"))) {\n    flow.set('switch2', msg.payload === 0 ? 1 : 0);\n    node.log(\"Switch 2 set to: \" + flow.get('switch2') + \" (GPIO: \" + msg.payload + \")\");\n} else {\n    node.log(\"Unknown switch input: \" + JSON.stringify({topic: msg.topic, payload: msg.payload}));\n}\n\n// Get current switch states\nconst switch1 = flow.get('switch1') || 0;\nconst switch2 = flow.get('switch2') || 0;\n\n// Determine display mode based on switch positions\nlet mode;\nif (switch1 === 0 && switch2 === 0) mode = 'time';       // Both OFF\nelse if (switch1 === 1 && switch2 === 0) mode = 'weather';  // Switch 1 ON\nelse if (switch1 === 0 && switch2 === 1) mode = 'system';   // Switch 2 ON\nelse if (switch1 === 1 && switch2 === 1) mode = 'custom';   // Both ON\nelse {\n    mode = 'time';  // Default fallback\n    node.warn(\"Invalid switch values: S1=\" + switch1 + \", S2=\" + switch2);\n}\n\n// Update mode and return message\nflow.set('switches_mode', mode);\nreturn { payload: mode, topic: 'mode_change' };",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -619,22 +618,6 @@
         "statusType": "auto",
         "x": 670,
         "y": 1250,
-        "wires": []
-    },
-    {
-        "id": "6a9809eb141c6e1e",
-        "type": "debug",
-        "z": "73619a0e20b766b0",
-        "name": "debug 1",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 360,
-        "y": 1380,
         "wires": []
     },
     {
