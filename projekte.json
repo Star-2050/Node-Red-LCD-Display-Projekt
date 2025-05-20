@@ -496,7 +496,7 @@
         "type": "rpi-gpio in",
         "z": "fa7e41cd5565ceab",
         "name": "",
-        "pin": "25",
+        "pin": "4",
         "intype": "tri",
         "debounce": "25",
         "read": false,
