@@ -285,31 +285,6 @@
         "wires": []
     },
     {
-        "id": "8d96462219076cd8",
-        "type": "inject",
-        "z": "73619a0e20b766b0",
-        "name": "Update Display (every second)",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "2",
-        "crontab": "",
-        "once": true,
-        "onceDelay": "2",
-        "topic": "",
-        "payload": "update_display",
-        "payloadType": "str",
-        "x": 190,
-        "y": 1000,
-        "wires": [
-            [
-                "1996b9100a3bb7f4"
-            ]
-        ]
-    },
-    {
         "id": "1996b9100a3bb7f4",
         "type": "function",
         "z": "73619a0e20b766b0",
@@ -620,6 +595,94 @@
         "x": 670,
         "y": 1250,
         "wires": []
+    },
+    {
+        "id": "fast_clock_update",
+        "type": "inject",
+        "z": "73619a0e20b766b0",
+        "name": "Update Clock (every second)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "clock_update",
+        "payload": "update_clock",
+        "payloadType": "str",
+        "x": 230,
+        "y": 980,
+        "wires": [
+            [
+                "clock_mode_check"
+            ]
+        ]
+    },
+    {
+        "id": "slow_display_update",
+        "type": "inject",
+        "z": "73619a0e20b766b0",
+        "name": "Update Other Displays (every 5s)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "3",
+        "topic": "other_update",
+        "payload": "update_display",
+        "payloadType": "str",
+        "x": 1170,
+        "y": 1260,
+        "wires": [
+            [
+                "other_mode_check"
+            ]
+        ]
+    },
+    {
+        "id": "clock_mode_check",
+        "type": "function",
+        "z": "73619a0e20b766b0",
+        "name": "Only update if in clock mode",
+        "func": "// Only proceed if we're in time mode\nconst currentMode = flow.get('switches_mode') || 'time';\nif (currentMode === 'time') {\n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 980,
+        "wires": [
+            [
+                "1996b9100a3bb7f4"
+            ]
+        ]
+    },
+    {
+        "id": "other_mode_check",
+        "type": "function",
+        "z": "73619a0e20b766b0",
+        "name": "Only update if NOT in clock mode",
+        "func": "// Only proceed if we're NOT in time mode\nconst currentMode = flow.get('switches_mode') || 'time';\nif (currentMode !== 'time') {\n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1560,
+        "y": 1260,
+        "wires": [
+            []
+        ]
     },
     {
         "id": "fb6ee8daa34f356e",
