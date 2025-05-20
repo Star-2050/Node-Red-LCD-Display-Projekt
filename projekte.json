@@ -495,69 +495,33 @@
         "id": "a9ed5169ce53b36e",
         "type": "rpi-gpio in",
         "z": "fa7e41cd5565ceab",
-        "name": "",
+        "name": "Schalter 1",
         "pin": "20",
         "intype": "tri",
         "debounce": "25",
         "read": false,
         "bcm": true,
-        "x": 130,
+        "x": 140,
         "y": 740,
         "wires": [
-            [
-                "c2de7dcb46d2d80d"
-            ]
+            []
         ]
     },
     {
         "id": "e4e609f0cd636984",
         "type": "rpi-gpio in",
         "z": "fa7e41cd5565ceab",
-        "name": "",
-        "pin": "21",
+        "name": "Schalter 2",
+        "pin": "20",
         "intype": "tri",
         "debounce": "25",
         "read": false,
         "bcm": true,
-        "x": 130,
+        "x": 140,
         "y": 800,
         "wires": [
-            [
-                "efecdc16a439ce0a"
-            ]
+            []
         ]
-    },
-    {
-        "id": "c2de7dcb46d2d80d",
-        "type": "debug",
-        "z": "fa7e41cd5565ceab",
-        "name": "debug 1",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 280,
-        "y": 740,
-        "wires": []
-    },
-    {
-        "id": "efecdc16a439ce0a",
-        "type": "debug",
-        "z": "fa7e41cd5565ceab",
-        "name": "debug 2",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 280,
-        "y": 800,
-        "wires": []
     },
     {
         "id": "a2f74bb3891d97bc",
