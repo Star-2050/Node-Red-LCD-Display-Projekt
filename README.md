@@ -13,18 +13,16 @@ Das Projekt umfasst folgende Module:
    - Zeigt simulierte Aktienkurse an
    - Buttons zum Umschalten zwischen verschiedenen Aktien
 
-3. **Mini-Quiz**
-   - Einfaches Ja/Nein-Quiz mit verschiedenen Fragen
-   - Button 1: Auswahl Ja
-   - Button 2: Auswahl Nein
-   - Automatisches weiter wenn Ja oder Nein gemacht
+3. **Reaktion Test**
+   - 
+   -
 
-4. **Tageszeit-Anzeige**
+5. **Tageszeit-Anzeige**
    - Zeigt aktuelle Uhrzeit und Datum an
    - Button 1: Wechsel zwischen verschiedenen Zeitregionen
    - Button 2: Zusatzinformationen anzeigen (Sekunden, Wochentag)
 
-5. **Wetter-Simulation**
+6. **Wetter-Simulation**
    - Zeigt Wetterdaten an
    - Buttons zum Umschalten zwischen verschiedenen Wetterwerten
 
