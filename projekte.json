@@ -1,21 +1,5 @@
 [
     {
-        "id": "73619a0e20b766b0",
-        "type": "tab",
-        "label": "Flow 1",
-        "disabled": false,
-        "info": "",
-        "env": []
-    },
-    {
-        "id": "fa7e41cd5565ceab",
-        "type": "tab",
-        "label": "Flow 2",
-        "disabled": true,
-        "info": "",
-        "env": []
-    },
-    {
         "id": "2bc2d46292aae71f",
         "type": "inject",
         "z": "73619a0e20b766b0",
@@ -48,7 +32,7 @@
         "method": "GET",
         "ret": "obj",
         "paytoqs": "ignore",
-        "url": "https://api.openweathermap.org/data/2.5/weather?q=Luxembourg&units=metric&appid=dd23ad94f206a6655e4d0dc9f2629032",
+        "url": "https://api.openweathermap.org/data/2.5/weather?q=Luxembourg&units=metric&appid=API-ID",
         "tls": "",
         "persist": false,
         "proxy": "",
@@ -98,8 +82,8 @@
         "y": 480,
         "wires": [
             [
-                "1996b9100a3bb7f4",
-                "b43b064180d72d86"
+                "b43b064180d72d86",
+                "1996b9100a3bb7f4"
             ]
         ]
     },
@@ -185,9 +169,7 @@
                 "vt": "str"
             },
             {
-                "p": "payload",
-                "vt": "str",
-                "v": ""
+                "p": "payload"
             }
         ],
         "repeat": "",
@@ -195,11 +177,13 @@
         "once": true,
         "onceDelay": "1",
         "topic": "init",
-        "x": 520,
-        "y": 600,
+        "payload": "",
+        "payloadType": "str",
+        "x": 1920,
+        "y": 1020,
         "wires": [
             [
-                "d72a326f373d8fc1"
+                "ab0cf9e476c8846c"
             ]
         ]
     },
@@ -215,8 +199,8 @@
         "winHide": false,
         "oldrc": false,
         "name": "Run Init/Clear Script",
-        "x": 770,
-        "y": 600,
+        "x": 2320,
+        "y": 1020,
         "wires": [
             [
                 "21f554a9c2ef9cce"
@@ -240,8 +224,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 1000,
-        "y": 560,
+        "x": 2560,
+        "y": 980,
         "wires": []
     },
     {
@@ -255,8 +239,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 1000,
-        "y": 600,
+        "x": 2560,
+        "y": 1020,
         "wires": []
     },
     {
@@ -270,8 +254,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 990,
-        "y": 640,
+        "x": 2550,
+        "y": 1060,
         "wires": []
     },
     {
@@ -289,18 +273,18 @@
         "type": "function",
         "z": "73619a0e20b766b0",
         "name": "Update Display Based on Mode",
-        "func": "// Get current switches mode\nconst switchesMode = flow.get('switches_mode') || 'time';\n\n// DEBUG mode\nnode.log(\"DISPLAY HANDLER - Current mode: \" + switchesMode);\n\n// Get weather display mode (only applies when in weather mode)\nconst weatherMode = flow.get('weather_mode') || 'temperature';\n\n// Get data from flow context\nconst temperature = flow.get('temperature') || 'N/A';\nconst humidity = flow.get('humidity') || 'N/A';\nconst wind = flow.get('wind') || 'N/A';\nconst description = flow.get('description') || 'N/A';\nconst city = flow.get('city') || 'Connecting...';\n\n// Time-specific data\nconst now = new Date();\nconst hours = now.getHours();\nconst minutes = now.getMinutes();\nconst seconds = now.getSeconds();\nconst timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;\nconst dateStr = now.toLocaleDateString('de-DE');\n\n// Clean function to remove/replace problematic characters\nfunction cleanText(text) {\n    if (typeof text !== 'string') return 'N/A';\n    \n    // Replace HTML entities and problematic characters\n    return text\n        .replace(/&#x2F;/g, '|')         // Replace HTML entity for slash\n        .replace(/&#(\\d+);/g, '')        // Remove all other HTML entities\n        .replace(/[^\\x20-\\x7E]/g, '')    // Keep only basic ASCII characters\n        .replace(/[^\\w\\s.,°%\\/-:]/g, ''); // Keep only alphanumeric, spaces, and some symbols\n}\n\n// Ensure values are strings and limit to display width (16 chars for standard LCD)\nfunction formatForDisplay(text, maxLength = 16) {\n    let cleaned = cleanText(String(text));\n    return cleaned.length > maxLength ? cleaned.substring(0, maxLength) : cleaned;\n}\n\n// Clean all displayed text\nconst cleanCity = formatForDisplay(city);\nconst cleanTemp = formatForDisplay(temperature);\nconst cleanHumidity = formatForDisplay(humidity);\nconst cleanWind = formatForDisplay(wind);\nconst cleanTimeStr = formatForDisplay(timeStr);\nconst cleanDateStr = formatForDisplay(dateStr);\n\n// Special formatting for description - capitalize first letter\nlet cleanDescription = formatForDisplay(description);\nif (cleanDescription.length > 0) {\n    cleanDescription = cleanDescription.charAt(0).toUpperCase() + cleanDescription.slice(1);\n}\n\n// Prepare messages for line 1 and 2\nlet line1;\nlet line2;\n\n// Mode 1: Time display (both switches OFF)\nif (switchesMode === 'time') {\n    line1 = { payload: \"Datum : \"+cleanDateStr, line: 1 };\n    line2 = { payload:  cleanTimeStr, line: 2 };\n    node.log(\"Display set to TIME mode\");\n}\n// Mode 2: Weather display (switch 1 ON, switch 2 OFF)\nelse if (switchesMode === 'weather') {\n    // Sub-modes for weather display based on weatherMode\n    node.log(\"Display set to WEATHER mode, sub-mode: \" + weatherMode);\n    switch(weatherMode) {\n        case 'temperature':\n            line1 = { payload: \"Temperatur\", line: 1 };\n            line2 = { payload: cleanTemp, line: 2 };\n            break;\n        case 'humidity':\n            line1 = { payload: \"Luftfeuchtigkeit\", line: 1 };\n            line2 = { payload: cleanHumidity, line: 2 };\n            break;\n        case 'wind':\n            line1 = { payload: \"Windgeschwindigk.\", line: 1 };\n            line2 = { payload: cleanWind, line: 2 };\n            break;\n        case 'description':\n            line1 = { payload: \"Wetterlage\", line: 1 };\n            line2 = { payload: cleanDescription, line: 2 };\n            break;\n        default:\n            line1 = { payload: \"Temperatur\", line: 1 };\n            line2 = { payload: cleanTemp, line: 2 };\n    }\n}\n// Mode 3: Stock info (switch 1 OFF, switch 2 ON)\nelse if (switchesMode === 'Stock') {\n    node.log(\"Display set to STOCK mode\");\n\n    // Hole alle gespeicherten Werte aus dem Flow-Kontext\n    const stockPrice = flow.get('stock_price') || 'N/A';\n    const stockChange = flow.get('stock_change') || 'N/A';\n    const stockSymbol = flow.get('stock_symbol') || 'AAPL';\n    const currentTime = flow.get('current_time') || 'N/A';\n\n    // Hole Stock-Display-Modus\n    const stockMode = flow.get('stock_mode') || 'price';\n\n    switch (stockMode) {\n        case 'price':\n            line1 = { payload: formatForDisplay(stockSymbol + \" Kurs\"), line: 1 };\n            line2 = { payload: formatForDisplay(stockPrice), line: 2 };\n            break;\n        case 'change':\n            line1 = { payload: formatForDisplay(stockSymbol + \" Änderung\"), line: 1 };\n            line2 = { payload: formatForDisplay(stockChange), line: 2 };\n            break;\n        case 'full':\n            line1 = { payload: formatForDisplay(stockSymbol + \" \" + stockPrice), line: 1 };\n            line2 = { payload: formatForDisplay(stockChange), line: 2 };\n            break;\n        default:\n            line1 = { payload: formatForDisplay(stockSymbol), line: 1 };\n            line2 = { payload: formatForDisplay(stockPrice), line: 2 };\n    }\n}\n\n// Mode 4: Custom message (both switches ON)\nelse if (switchesMode === 'custom') {\n    node.log(\"Display set to CUSTOM mode\");\n    line1 = { payload: \"Benutzerdefiniert\", line: 1 };\n    line2 = { payload: \"Hallo Welt!\", line: 2 };\n}\n// Default fallback to time display\nelse {\n    node.warn(\"Unknown mode: \" + switchesMode + \", defaulting to TIME\");\n    line1 = { payload: \"Datum\", line: 1 };\n    line2 = { payload: cleanDateStr + \" \" + cleanTimeStr, line: 2 };\n}\n\n// Return both messages as array\nreturn [line1, line2];",
+        "func": "// Get current switches mode\nconst switchesMode = flow.get('switches_mode') || 'time';\n\n// DEBUG mode\nnode.log(\"DISPLAY HANDLER - Current mode: \" + switchesMode);\n\n// Get weather display mode (only applies when in weather mode)\nconst weatherMode = flow.get('weather_mode') || 'temperature';\n\n// Get data from flow context\nconst temperature = flow.get('temperature') || 'N/A';\nconst humidity = flow.get('humidity') || 'N/A';\nconst wind = flow.get('wind') || 'N/A';\nconst description = flow.get('description') || 'N/A';\nconst city = flow.get('city') || 'Connecting...';\n\n// Time-specific data\nconst now = new Date();\nconst hours = now.getHours();\nconst minutes = now.getMinutes();\nconst seconds = now.getSeconds();\nconst timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;\nconst dateStr = now.toLocaleDateString('de-DE');\n\n// Clean function to remove/replace problematic characters\nfunction cleanText(text) {\n    if (typeof text !== 'string') return 'N/A';\n\n    // Replace HTML entities and problematic characters\n    return text\n        .replace(/&#x2F;/g, '|')         // Replace HTML entity for slash\n        .replace(/&#(\\d+);/g, '')        // Remove all other HTML entities\n        .replace(/[^\\x20-\\x7E]/g, '')    // Keep only basic ASCII characters\n        .replace(/[^\\w\\s.,°%\\/-:$^v]/g, ''); // Keep alphanumeric, spaces, and crypto symbols ($ ^ v)\n}\n\n// Ensure values are strings and limit to display width (16 chars for standard LCD)\nfunction formatForDisplay(text, maxLength = 16) {\n    let cleaned = cleanText(String(text));\n    return cleaned.length > maxLength ? cleaned.substring(0, maxLength) : cleaned;\n}\n\n// Clean all displayed text\nconst cleanCity = formatForDisplay(city);\nconst cleanTemp = formatForDisplay(temperature);\nconst cleanHumidity = formatForDisplay(humidity);\nconst cleanWind = formatForDisplay(wind);\nconst cleanTimeStr = formatForDisplay(timeStr);\nconst cleanDateStr = formatForDisplay(dateStr);\n\n// Special formatting for description - capitalize first letter\nlet cleanDescription = formatForDisplay(description);\nif (cleanDescription.length > 0) {\n    cleanDescription = cleanDescription.charAt(0).toUpperCase() + cleanDescription.slice(1);\n}\n\n// Prepare messages for line 1 and 2\nlet line1;\nlet line2;\n\n// Mode 1: Time display (both switches OFF)\nif (switchesMode === 'time') {\n    line1 = { payload: \"Datum : \" + cleanDateStr, line: 1 };\n    line2 = { payload: cleanTimeStr, line: 2 };\n    node.log(\"Display set to TIME mode\");\n}\n// Mode 2: Weather display (switch 1 ON, switch 2 OFF)\nelse if (switchesMode === 'weather') {\n    // Sub-modes for weather display based on weatherMode\n    node.log(\"Display set to WEATHER mode, sub-mode: \" + weatherMode);\n    switch (weatherMode) {\n        case 'temperature':\n            line1 = { payload: \"Temperatur\", line: 1 };\n            line2 = { payload: cleanTemp, line: 2 };\n            break;\n        case 'humidity':\n            line1 = { payload: \"Luftfeuchtigkeit\", line: 1 };\n            line2 = { payload: cleanHumidity, line: 2 };\n            break;\n        case 'wind':\n            line1 = { payload: \"Windgeschwindigk.\", line: 1 };\n            line2 = { payload: cleanWind, line: 2 };\n            break;\n        case 'description':\n            line1 = { payload: \"Wetterlage\", line: 1 };\n            line2 = { payload: cleanDescription, line: 2 };\n            break;\n        default:\n            line1 = { payload: \"Temperatur\", line: 1 };\n            line2 = { payload: cleanTemp, line: 2 };\n    }\n}\n// Mode 3: Stock info (switch 1 OFF, switch 2 ON)\nelse if (switchesMode === 'Stock') {\n    node.log(\"Display set to STOCK mode\");\n\n    // Hole alle gespeicherten Werte aus dem Flow-Kontext\n    const stockPrice = flow.get('stock_price') || 'N/A';\n    const stockChange = flow.get('stock_change') || 'N/A';\n    const stockSymbol = flow.get('stock_symbol') || 'AAPL';\n    const currentTime = flow.get('current_time') || 'N/A';\n\n    // Hole Stock-Display-Modus\n    const stockMode = flow.get('stock_mode') || 'price';\n\n    // Log für Debug\n    node.log(\"Stock Mode: \" + stockMode + \", Symbol: \" + stockSymbol + \", Price: \" + stockPrice);\n\n    switch (stockMode) {\n        case 'price':\n            // Zeige Symbol und aktuellen Preis\n            line1 = { payload: formatForDisplay(stockSymbol + \" Kurs\"), line: 1 };\n            line2 = { payload: formatForDisplay(stockPrice), line: 2 };\n            node.log(\"Displaying PRICE mode: \" + stockSymbol + \" - \" + stockPrice);\n            break;\n\n        case 'change':\n            // Zeige Symbol und Kursänderung\n            line1 = { payload: formatForDisplay(stockSymbol + \" Change\"), line: 1 };\n            line2 = { payload: formatForDisplay(stockChange), line: 2 };\n            node.log(\"Displaying CHANGE mode: \" + stockSymbol + \" - \" + stockChange);\n            break;\n\n        case 'full':\n            // Zeige Symbol + Preis in Zeile 1, Änderung in Zeile 2\n            const fullLine1 = stockSymbol + \" \" + stockPrice;\n            line1 = { payload: formatForDisplay(fullLine1), line: 1 };\n            line2 = { payload: formatForDisplay(stockChange), line: 2 };\n            node.log(\"Displaying FULL mode: \" + fullLine1 + \" | \" + stockChange);\n            break;\n\n        default:\n            // Fallback: Zeige nur Symbol und Preis\n            node.warn(\"Unknown stock mode: \" + stockMode + \", defaulting to price display\");\n            line1 = { payload: formatForDisplay(stockSymbol + \" Kurs\"), line: 1 };\n            line2 = { payload: formatForDisplay(stockPrice), line: 2 };\n            break;\n    }\n\n    // Zusätzliche Debug-Informationen\n    node.log(\"Final display - Line 1: '\" + line1.payload + \"', Line 2: '\" + line2.payload + \"'\");\n}\n// Mode 4: Kryptowährungs-Modus (both switches ON)\nelse if (switchesMode === 'crypto') {\n    node.log(\"Display set to CRYPTO mode\");\n\n    // Hole alle gespeicherten Werte aus dem Flow-Kontext\n    const cryptoPrice = flow.get('crypto_price') || 'N/A';\n    const cryptoChange = flow.get('crypto_change') || 'N/A';\n    const cryptoSymbol = flow.get('crypto_symbol') || 'BTC';\n    const cryptoName = flow.get('crypto_name') || 'Bitcoin';\n    const currentTime = flow.get('current_time') || 'N/A';\n\n    // Hole Crypto-Display-Modus\n    const cryptoMode = flow.get('crypto_mode') || 'price';\n    \n    // Log für Debug\n    node.log(\"Crypto Mode: \" + cryptoMode + \", Symbol: \" + cryptoSymbol + \", Price: \" + cryptoPrice);\n\n    switch (cryptoMode) {\n        case 'price':\n            // Zeige Symbol und aktuellen Preis\n            line1 = { payload: formatForDisplay(cryptoSymbol + \" Kurs\"), line: 1 };\n            line2 = { payload: formatForDisplay(cryptoPrice), line: 2 };\n            node.log(\"Displaying PRICE mode: \" + cryptoSymbol + \" - \" + cryptoPrice);\n            break;\n            \n        case 'change':\n            // Zeige Symbol und 24h-Änderung\n            line1 = { payload: formatForDisplay(cryptoSymbol + \" 24h\"), line: 1 };\n            line2 = { payload: formatForDisplay(cryptoChange), line: 2 };\n            node.log(\"Displaying CHANGE mode: \" + cryptoSymbol + \" - \" + cryptoChange);\n            break;\n            \n        case 'full':\n            // Zeige Symbol + Preis in Zeile 1, Änderung in Zeile 2\n            const fullLine1 = cryptoSymbol + \" \" + cryptoPrice;\n            line1 = { payload: formatForDisplay(fullLine1), line: 1 };\n            line2 = { payload: formatForDisplay(cryptoChange), line: 2 };\n            node.log(\"Displaying FULL mode: \" + fullLine1 + \" | \" + cryptoChange);\n            break;\n            \n        default:\n            // Fallback: Zeige nur Symbol und Preis\n            node.warn(\"Unknown crypto mode: \" + cryptoMode + \", defaulting to price display\");\n            line1 = { payload: formatForDisplay(cryptoSymbol + \" Kurs\"), line: 1 };\n            line2 = { payload: formatForDisplay(cryptoPrice), line: 2 };\n            break;\n    }\n    \n    // Zusätzliche Debug-Informationen\n    node.log(\"Final crypto display - Line 1: '\" + line1.payload + \"', Line 2: '\" + line2.payload + \"'\");\n}\n// Default fallback to time display\nelse {\n    node.warn(\"Unknown mode: \" + switchesMode + \", defaulting to TIME\");\n    line1 = { payload: \"Datum\", line: 1 };\n    line2 = { payload: cleanDateStr + \" \" + cleanTimeStr, line: 2 };\n}\n\n// Return both messages as array\nreturn [line1, line2];",
         "outputs": 2,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1480,
-        "y": 820,
+        "x": 2010,
+        "y": 780,
         "wires": [
             [
-                "cd04a40c673c7eee"
+                "151a953adf1df738"
             ],
             [
                 "5a891e0d105c5864"
@@ -318,8 +302,8 @@
         "syntax": "mustache",
         "template": " --line \"{{line}}\" --message \"{{payload}}\"",
         "output": "str",
-        "x": 1790,
-        "y": 820,
+        "x": 2510,
+        "y": 780,
         "wires": [
             [
                 "37d4dde3f2ade25d",
@@ -344,8 +328,8 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 1700,
-        "y": 900,
+        "x": 2410,
+        "y": 840,
         "wires": [
             [
                 "cd04a40c673c7eee"
@@ -364,8 +348,8 @@
         "winHide": false,
         "oldrc": false,
         "name": "Run Write Script",
-        "x": 2070,
-        "y": 820,
+        "x": 2790,
+        "y": 780,
         "wires": [
             [
                 "0b7b303e8658b7e5"
@@ -389,8 +373,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 2100,
-        "y": 760,
+        "x": 2820,
+        "y": 720,
         "wires": []
     },
     {
@@ -404,8 +388,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 2300,
-        "y": 800,
+        "x": 3020,
+        "y": 760,
         "wires": []
     },
     {
@@ -419,8 +403,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 2300,
-        "y": 840,
+        "x": 3020,
+        "y": 800,
         "wires": []
     },
     {
@@ -434,8 +418,8 @@
         "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "x": 2290,
-        "y": 880,
+        "x": 3010,
+        "y": 840,
         "wires": []
     },
     {
@@ -458,13 +442,14 @@
         "debounce": "100",
         "read": false,
         "bcm": true,
-        "x": 110,
-        "y": 1060,
+        "x": 50,
+        "y": 1860,
         "wires": [
             [
                 "172f611c7655f1aa",
                 "4099fe7620e04b1d",
-                "78defdd32aa8d72f"
+                "78defdd32aa8d72f",
+                "crypto_manual_button"
             ]
         ]
     },
@@ -475,6 +460,7 @@
         "name": "Cycle Through Weather Modes",
         "func": "// Only process when button is pressed (rising edge)\nif (msg.payload !== 1) return null;\n\n// Only cycle weather modes if we're in weather display mode\nconst switchesMode = flow.get('switches_mode') || 'time';\nif (switchesMode !== 'weather') {\n    // We're not in weather mode, so button does nothing\n    return null;\n}\n\n// Get current mode\nconst currentMode = flow.get('weather_mode') || 'temperature';\n\n// Define the cycle order - limited to just 4 essential modes\nconst modes = ['temperature', 'humidity', 'wind', 'description'];\n\n// Track button press count to prevent excessive cycling\nlet pressCount = flow.get('button_press_count') || 0;\npressCount++;\n\n// Store press count for debouncing purposes\nflow.set('button_press_count', pressCount);\nflow.set('last_button_press', Date.now());\n\n// Find current index\nlet currentIndex = modes.indexOf(currentMode);\n\n// If current mode not found in array, default to first mode\nif (currentIndex === -1) currentIndex = 0;\n\n// Move to next mode (or back to first if at end)\n// This ensures limited cycling through only 4 modes\nlet nextIndex = (currentIndex + 1) % modes.length;\n\n// Set the next mode\nconst nextMode = modes[nextIndex];\nflow.set('weather_mode', nextMode);\nmsg.payload = nextMode;\n\n// Also log mode change\nnode.log(\"Weather display mode changed to: \" + nextMode + \" (press #\" + pressCount + \")\");\n\n// Return the message with the new mode\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -483,8 +469,8 @@
         "y": 1080,
         "wires": [
             [
-                "1996b9100a3bb7f4",
-                "e0337f99aca4f801"
+                "e0337f99aca4f801",
+                "1996b9100a3bb7f4"
             ]
         ]
     },
@@ -493,7 +479,7 @@
         "type": "debug",
         "z": "73619a0e20b766b0",
         "name": "Button Press",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -563,7 +549,7 @@
         "type": "function",
         "z": "73619a0e20b766b0",
         "name": "Process Switch Changes",
-        "func": "// Process input from GPIO pins\n// Check if the message has pin information in the topic\nconst isPinTopic = msg.topic && (msg.topic.includes(\"20\") || msg.topic.includes(\"21\"));\n\n// Store switch states based on pin number or explicit topic\nif (msg.topic === 'schalter1' || (isPinTopic && msg.topic.includes(\"21\"))) {\n    // For pull-up resistors: 0 = pressed/ON, 1 = not pressed/OFF\n    // If using pull-up, logical state is inverse of electrical state\n    flow.set('switch1', msg.payload === 0 ? 1 : 0);\n    node.log(\"Switch 1 set to: \" + flow.get('switch1') + \" (GPIO: \" + msg.payload + \")\");\n} else if (msg.topic === 'schalter2' || (isPinTopic && msg.topic.includes(\"20\"))) {\n    flow.set('switch2', msg.payload === 0 ? 1 : 0);\n    node.log(\"Switch 2 set to: \" + flow.get('switch2') + \" (GPIO: \" + msg.payload + \")\");\n} else {\n    node.log(\"Unknown switch input: \" + JSON.stringify({topic: msg.topic, payload: msg.payload}));\n}\n\n// Get current switch states\nconst switch1 = flow.get('switch1') || 0;\nconst switch2 = flow.get('switch2') || 0;\n\n// Determine display mode based on switch positions\nlet mode;\nif (switch1 === 0 && switch2 === 0) mode = 'time';       // Both OFF\nelse if (switch1 === 1 && switch2 === 0) mode = 'weather';  // Switch 1 ON\nelse if (switch1 === 0 && switch2 === 1) mode = 'Stock';   // Switch 2 ON\nelse if (switch1 === 1 && switch2 === 1) mode = 'custom';   // Both ON\nelse {\n    mode = 'time';  // Default fallback\n    node.warn(\"Invalid switch values: S1=\" + switch1 + \", S2=\" + switch2);\n}\n\n// Update mode and return message\nflow.set('switches_mode', mode);\nreturn { payload: mode, topic: 'mode_change' };",
+        "func": "// Process input from GPIO pins\n// Check if the message has pin information in the topic\nconst isPinTopic = msg.topic && (msg.topic.includes(\"20\") || msg.topic.includes(\"21\"));\n\n// Store switch states based on pin number or explicit topic\nif (msg.topic === 'schalter1' || (isPinTopic && msg.topic.includes(\"21\"))) {\n    // For pull-up resistors: 0 = pressed/ON, 1 = not pressed/OFF\n    // If using pull-up, logical state is inverse of electrical state\n    flow.set('switch1', msg.payload === 0 ? 1 : 0);\n    node.log(\"Switch 1 set to: \" + flow.get('switch1') + \" (GPIO: \" + msg.payload + \")\");\n} else if (msg.topic === 'schalter2' || (isPinTopic && msg.topic.includes(\"20\"))) {\n    flow.set('switch2', msg.payload === 0 ? 1 : 0);\n    node.log(\"Switch 2 set to: \" + flow.get('switch2') + \" (GPIO: \" + msg.payload + \")\");\n} else {\n    node.log(\"Unknown switch input: \" + JSON.stringify({topic: msg.topic, payload: msg.payload}));\n}\n\n// Get current switch states\nconst switch1 = flow.get('switch1') || 0;\nconst switch2 = flow.get('switch2') || 0;\n\n// VERBESSERTE SWITCH-LOGIK: Prüfe zuerst die eindeutigen Zustände\nlet mode;\n\n// EINDEUTIGE ZUSTÄNDE ZUERST\nif (switch1 === 0 && switch2 === 0) {\n    mode = 'time';       // Both OFF - Uhrzeit-Modus\n    node.log(\"Switch Mode: BOTH OFF → TIME\");\n} \nelse if (switch1 === 1 && switch2 === 1) {\n    mode = 'crypto';     // Both ON - Quiz-Modus\n    node.log(\"Switch Mode: BOTH ON → QUIZ\");\n}\n// DANN DIE EINZELNEN SWITCHES\nelse if (switch1 === 1 && switch2 === 0) {\n    mode = 'weather';    // Switch 1 ON - Wetter-Modus\n    node.log(\"Switch Mode: SWITCH1 ON → WEATHER\");\n}\nelse if (switch1 === 0 && switch2 === 1) {\n    mode = 'Stock';      // Switch 2 ON - Aktien-Modus\n    node.log(\"Switch Mode: SWITCH2 ON → STOCK\");\n}\n// FALLBACK FÜR UNERWARTETE WERTE\nelse {\n    mode = 'time';  // Default fallback\n    node.warn(\"Unexpected switch values: S1=\" + switch1 + \", S2=\" + switch2 + \" → Defaulting to TIME\");\n}\n\n// Update mode and return message\nflow.set('switches_mode', mode);\nnode.log(\"Final Mode Set: \" + mode);\n\nreturn { payload: mode, topic: 'mode_change' };",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -574,9 +560,8 @@
         "y": 1250,
         "wires": [
             [
-                "1996b9100a3bb7f4",
                 "12688aa26a04e5ca",
-                "f378121b91d574f0"
+                "1996b9100a3bb7f4"
             ]
         ]
     },
@@ -623,31 +608,6 @@
         ]
     },
     {
-        "id": "slow_display_update",
-        "type": "inject",
-        "z": "73619a0e20b766b0",
-        "name": "Update Other Displays (every 5s)",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "5",
-        "crontab": "",
-        "once": true,
-        "onceDelay": "3",
-        "topic": "other_update",
-        "payload": "update_display",
-        "payloadType": "str",
-        "x": 1440,
-        "y": 1260,
-        "wires": [
-            [
-                "other_mode_check"
-            ]
-        ]
-    },
-    {
         "id": "clock_mode_check",
         "type": "function",
         "z": "73619a0e20b766b0",
@@ -664,133 +624,6 @@
         "wires": [
             [
                 "1996b9100a3bb7f4"
-            ]
-        ]
-    },
-    {
-        "id": "other_mode_check",
-        "type": "function",
-        "z": "73619a0e20b766b0",
-        "name": "Only update if NOT in clock mode",
-        "func": "// Only proceed if we're NOT in time mode\nconst currentMode = flow.get('switches_mode') || 'time';\nif (currentMode !== 'time') {\n    return msg;\n}\nreturn null;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1830,
-        "y": 1260,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "f378121b91d574f0",
-        "type": "delay",
-        "z": "73619a0e20b766b0",
-        "name": "",
-        "pauseType": "delay",
-        "timeout": "1",
-        "timeoutUnits": "seconds",
-        "rate": "1",
-        "nbRateUnits": "1",
-        "rateUnits": "second",
-        "randomFirst": "1",
-        "randomLast": "5",
-        "randomUnits": "seconds",
-        "drop": false,
-        "allowrate": false,
-        "outputs": 1,
-        "x": 780,
-        "y": 1160,
-        "wires": [
-            [
-                "d72a326f373d8fc1"
-            ]
-        ]
-    },
-    {
-        "id": "78defdd32aa8d72f",
-        "type": "function",
-        "z": "73619a0e20b766b0",
-        "name": "Only update if in clock mode",
-        "func": "// Only proceed if we're in time mode\nconst currentMode = flow.get('switches_mode') || 'Stock';\nif (currentMode === 'Stock') {\n    return msg;\n}\nreturn null;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 360,
-        "y": 1360,
-        "wires": [
-            [
-                "f15478bfc1c3599a"
-            ]
-        ]
-    },
-    {
-        "id": "94012a64319fa51b",
-        "type": "function",
-        "z": "73619a0e20b766b0",
-        "name": "Only update if in clock mode",
-        "func": "// Only proceed if we're in time mode\nconst currentMode = flow.get('switches_mode') || 'Stock';\nif (currentMode === 'Stock') {\n    return msg;\n}\nreturn null;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 340,
-        "y": 1440,
-        "wires": [
-            [
-                "f77d641a8a31eefa"
-            ]
-        ]
-    },
-    {
-        "id": "0f60d230ee7f1d8d",
-        "type": "inject",
-        "z": "73619a0e20b766b0",
-        "name": "Aktienmarkt Update (alle 5 min)",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "300",
-        "once": true,
-        "onceDelay": "5",
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 680,
-        "y": 1380,
-        "wires": [
-            [
-                "fetch_stock_data"
-            ]
-        ]
-    },
-    {
-        "id": "36b0baf81d79c4cc",
-        "type": "function",
-        "z": "73619a0e20b766b0",
-        "name": "Formatiere und speichere Aktiendaten",
-        "func": "// Überprüfe, ob überhaupt Daten vorhanden sind\nif (!msg.payload) {\n   node.error(\"Keine Daten empfangen\");\n   return null;\n}\n\n// Debug-Info\nnode.log(\"Empfangene Daten: \" + JSON.stringify(msg.payload));\n\n// Prüfe auf Fehlermeldung in der API-Antwort\nif (msg.payload.error) {\n   node.error(\"API-Fehler: \" + msg.payload.error);\n   return null;\n}\n\n// Prüfe auf erforderliche Felder\nif (typeof msg.payload.c === 'undefined') {\n   // Setze Dummy-Daten für Tests\n   flow.set('stock_price', 'N/A');\n   flow.set('stock_change', 'N/A');\n   flow.set('stock_symbol', msg.symbol || 'AAPL');\n   flow.set('current_time', new Date().toLocaleTimeString('de-DE'));\n   flow.set('switches_mode', 'Stock');\n   node.warn(\"Fehlende Aktiendaten - Dummy-Werte gesetzt\");\n   return msg;\n}\n\n// Extrahiere und formatiere Daten\nconst stockData = msg.payload;\nconst symbol = msg.symbol || 'AAPL';\n\n// Aktuelle Zeit\nconst now = new Date();\nconst hours = now.getHours();\nconst minutes = now.getMinutes();\nconst timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes;\n\n// Aktienpreis und Änderungen\nconst currentPrice = stockData.c.toFixed(2) + '$';\nconst change = stockData.d.toFixed(2);\nconst percentChange = stockData.dp.toFixed(2);\n\n// Pfeil-Symbol basierend auf Kursänderung (ASCII-Version)\nconst arrow = percentChange >= 0 ? '^' : 'v';\nconst changeFormat = arrow + ' ' + Math.abs(change) + '$ (' + Math.abs(percentChange) + '%)';\n\n// Speichere alle Daten im Flow-Kontext\nflow.set('stock_price', currentPrice);\nflow.set('stock_change', changeFormat);\nflow.set('stock_symbol', symbol);\nflow.set('current_time', timeStr);\n\n// Rotiere Stock Mode (price -> change -> full)\nconst modes = ['price', 'change', 'full'];\nconst currentMode = flow.get('stock_mode') || 'price';\nconst currentIndex = modes.indexOf(currentMode);\nconst nextIndex = (currentIndex + 1) % modes.length;\nflow.set('stock_mode', modes[nextIndex]);\n\n// Setze switches_mode auf Stock\nflow.set('switches_mode', 'Stock');\n\nreturn msg;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1210,
-        "y": 1380,
-        "wires": [
-            [
-                "85e67035ab842076"
             ]
         ]
     },
@@ -816,12 +649,21 @@
         "name": "Dynamischer Aktienabruf",
         "method": "GET",
         "ret": "obj",
-        "url": "https://finnhub.io/api/v1/quote?symbol={{symbol}}&token=DEIN_API_KEY",
+        "paytoqs": "ignore",
+        "url": "https://finnhub.io/api/v1/quote?symbol={{symbol}}&token=API-TOKEN",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
         "x": 860,
         "y": 1680,
         "wires": [
             [
-                "ae68e326a10a4a39"
+                "ae68e326a10a4a39",
+                "75d38e056053f7af"
             ]
         ]
     },
@@ -830,33 +672,19 @@
         "type": "function",
         "z": "73619a0e20b766b0",
         "name": "Aktualisiere Aktie im Flow",
-        "func": "// Überprüfe, ob gültige Daten vorhanden sind\nif (!msg.payload || !msg.payload.c) {\n    node.error(\"Ungültige Aktiendaten erhalten\");\n    return null;\n}\n\n// Extrahiere und formatiere Daten\nconst stockData = msg.payload;\nconst symbol = msg.symbol;\n\n// Aktuelle Zeit\nconst now = new Date();\nconst hours = now.getHours();\nconst minutes = now.getMinutes();\nconst timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes;\n\n// Aktienpreis und Änderungen\nconst currentPrice = stockData.c.toFixed(2) + '$';\nconst change = stockData.d.toFixed(2);\nconst percentChange = stockData.dp.toFixed(2) + '%';\n\n// Pfeil-Symbol basierend auf Kursänderung\nconst arrow = percentChange >= 0 ? '↑' : '↓';\nconst changeFormat = arrow + ' ' + Math.abs(change) + '$ (' + Math.abs(parseFloat(percentChange)) + '%)';\n\n// Speichere alle Daten im Flow-Kontext\nflow.set('stock_price', currentPrice);\nflow.set('stock_change', changeFormat);\nflow.set('stock_symbol', symbol);\nflow.set('current_time', timeStr);\n\n// Hole Anzeigemodus\nconst displayMode = flow.get('display_mode') || 'stock_price';\n\n// Sende aktuellen Anzeigemodus zum Display-Handler\nmsg.payload = displayMode;\n\n// Füge Zeitstempel der letzten Aktualisierung hinzu\nflow.set('last_updated', Date.now());\n\nreturn msg;",
-        "outputs": 1,
-        "x": 1110,
-        "y": 1680,
-        "wires": [
-            [
-                "85e67035ab842076"
-            ]
-        ]
-    },
-    {
-        "id": "f77d641a8a31eefa",
-        "type": "function",
-        "z": "73619a0e20b766b0",
-        "name": "Anzeigemodus wechseln",
-        "func": "// Verfügbare Anzeigemodi\nconst modes = ['stock_price', 'stock_change', 'full_info'];\n\n// Aktuellen Modus abrufen\nconst currentMode = flow.get('display_mode') || modes[0];\n\n// Index des aktuellen Modus finden\nconst currentIndex = modes.indexOf(currentMode);\n\n// Zum nächsten Modus wechseln\nconst nextIndex = (currentIndex + 1) % modes.length;\nconst nextMode = modes[nextIndex];\n\n// Neuen Modus speichern\nflow.set('display_mode', nextMode);\n\n// Sende neuen Modus an Display Handler\nmsg.payload = nextMode;\nreturn msg;",
+        "func": "// Überprüfe, ob überhaupt Daten vorhanden sind\nif (!msg.payload) {\n   node.error(\"Keine Daten empfangen - msg.payload ist null/undefined\");\n   return null;\n}\n\n// Debug-Info\nnode.log(\"Empfangene Daten: \" + JSON.stringify(msg.payload));\n\n// Prüfe auf Fehlermeldung in der API-Antwort\nif (msg.payload.error) {\n   node.error(\"API-Fehler: \" + msg.payload.error);\n   return null;\n}\n\n// Prüfe auf erforderliche Felder - VERBESSERTE FEHLERBEHANDLUNG\nif (typeof msg.payload.c === 'undefined' || msg.payload.c === null) {\n   // Setze Dummy-Daten für Tests\n   flow.set('stock_price', 'N/A');\n   flow.set('stock_change', 'N/A');\n   flow.set('stock_symbol', msg.symbol || 'AAPL');\n   \n   // Aktuelle Zeit\n   const now = new Date();\n   const hours = now.getHours();\n   const minutes = now.getMinutes();\n   const timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes;\n   flow.set('current_time', timeStr);\n   \n   // Setze Stock Mode\n   flow.set('stock_mode', 'price');\n   flow.set('switches_mode', 'Stock');\n   \n   node.warn(\"Fehlende Aktiendaten - Dummy-Werte gesetzt\");\n   \n   // WICHTIG: Nachricht weitergeben, damit Display aktualisiert wird\n   msg.payload = 'stock_data_updated';\n   return msg;\n}\n\n// ===== ERFOLGREICHE DATENVERARBEITUNG =====\nconst stockData = msg.payload;\nconst symbol = msg.symbol || 'AAPL';\n\nnode.log(\"Verarbeitung startet für Symbol: \" + symbol);\n\n// Aktuelle Zeit\nconst now = new Date();\nconst hours = now.getHours();\nconst minutes = now.getMinutes();\nconst timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes;\n\n// Aktienpreis und Änderungen (behalte die ursprünglichen Zahlen)\nconst currentPrice = stockData.c.toFixed(2) + '$';\nconst change = stockData.d || 0;  // Fallback auf 0 wenn nicht vorhanden\nconst percentChangeValue = stockData.dp || 0;  // Fallback auf 0 wenn nicht vorhanden\n\nnode.log(\"Rohdaten - Preis: \" + stockData.c + \", Änderung: \" + change + \", Prozent: \" + percentChangeValue);\n\n// Pfeil-Symbol basierend auf Kursänderung (ASCII für LCD-Display)\nconst arrow = percentChangeValue >= 0 ? '^' : 'v';\nconst changeFormat = arrow + ' ' + Math.abs(change).toFixed(2) + '$ (' + Math.abs(percentChangeValue).toFixed(2) + '%)';\n\nnode.log(\"Formatierte Daten - Preis: \" + currentPrice + \", Änderung: \" + changeFormat);\n\n// ===== SPEICHERE ALLE DATEN IM FLOW-KONTEXT =====\nflow.set('stock_price', currentPrice);\nflow.set('stock_change', changeFormat);\nflow.set('stock_symbol', symbol);\nflow.set('current_time', timeStr);\n\n// Rotiere Stock Mode automatisch bei jedem Update (price -> change -> full)\nconst modes = ['price', 'change', 'full'];\nconst currentMode = flow.get('stock_mode') || 'price';\nconst currentIndex = modes.indexOf(currentMode);\nconst nextIndex = (currentIndex + 1) % modes.length;\nconst nextMode = modes[nextIndex];\nflow.set('stock_mode', nextMode);\n\nnode.log(\"Stock Mode gewechselt von '\" + currentMode + \"' zu '\" + nextMode + \"'\");\n\n// Setze switches_mode auf Stock (damit Display auf Stock-Modus wechselt)\nflow.set('switches_mode', 'Stock');\n\n// Füge Zeitstempel der letzten Aktualisierung hinzu\nflow.set('last_updated', Date.now());\n\n// Log für Debug\nnode.log(\"✅ Aktie \" + symbol + \" erfolgreich aktualisiert: \" + currentPrice + \" \" + changeFormat);\n\n// Sende Nachricht für Display-Update\nmsg.payload = 'stock_updated';\nmsg.symbol = symbol;\nmsg.price = currentPrice;\nmsg.change = changeFormat;\nmsg.mode = nextMode;\n\nreturn msg;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 690,
-        "y": 1440,
+        "x": 1110,
+        "y": 1680,
         "wires": [
             [
-                "85e67035ab842076"
+                "596da07b881a8e24",
+                "1996b9100a3bb7f4"
             ]
         ]
     },
@@ -870,11 +698,111 @@
         "debounce": "100",
         "read": false,
         "bcm": true,
-        "x": 110,
-        "y": 1120,
+        "x": 50,
+        "y": 1920,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "75d38e056053f7af",
+        "type": "debug",
+        "z": "73619a0e20b766b0",
+        "name": "debug 1",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1060,
+        "y": 1640,
+        "wires": []
+    },
+    {
+        "id": "596da07b881a8e24",
+        "type": "debug",
+        "z": "73619a0e20b766b0",
+        "name": "debug 3",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1360,
+        "y": 1680,
+        "wires": []
+    },
+    {
+        "id": "151a953adf1df738",
+        "type": "delay",
+        "z": "73619a0e20b766b0",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "30",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 2270,
+        "y": 740,
         "wires": [
             [
-                "94012a64319fa51b"
+                "cd04a40c673c7eee"
+            ]
+        ]
+    },
+    {
+        "id": "0f60d230ee7f1d8d",
+        "type": "inject",
+        "z": "73619a0e20b766b0",
+        "name": "Aktienmarkt Update (alle 5 min)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "5",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 420,
+        "y": 1380,
+        "wires": [
+            [
+                "3abb43a9e49a8bdd"
+            ]
+        ]
+    },
+    {
+        "id": "36b0baf81d79c4cc",
+        "type": "function",
+        "z": "73619a0e20b766b0",
+        "name": "Formatiere und speichere Aktiendaten",
+        "func": "// Überprüfe, ob überhaupt Daten vorhanden sind\nif (!msg.payload) {\n   node.error(\"Keine Daten empfangen\");\n   return null;\n}\n\n// Debug-Info\nnode.log(\"Empfangene Daten: \" + JSON.stringify(msg.payload));\n\n// Prüfe auf Fehlermeldung in der API-Antwort\nif (msg.payload.error) {\n   node.error(\"API-Fehler: \" + msg.payload.error);\n   return null;\n}\n\n// Prüfe auf erforderliche Felder\nif (typeof msg.payload.c === 'undefined') {\n   // Setze Dummy-Daten für Tests\n   flow.set('stock_price', 'N/A');\n   flow.set('stock_change', 'N/A');\n   flow.set('stock_symbol', msg.symbol || 'AAPL');\n   flow.set('current_time', new Date().toLocaleTimeString('de-DE'));\n   flow.set('switches_mode', 'Stock');\n   node.warn(\"Fehlende Aktiendaten - Dummy-Werte gesetzt\");\n   return msg;\n}\n\n// Extrahiere und formatiere Daten\nconst stockData = msg.payload;\nconst symbol = msg.symbol || 'AAPL';\n\n// Aktuelle Zeit\nconst now = new Date();\nconst hours = now.getHours();\nconst minutes = now.getMinutes();\nconst timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes;\n\n// Aktienpreis und Änderungen\nconst currentPrice = stockData.c.toFixed(2) + '$';\nconst change = stockData.d.toFixed(2);\nconst percentChange = stockData.dp.toFixed(2);\n\n// Pfeil-Symbol basierend auf Kursänderung (ASCII-Version)\nconst arrow = percentChange >= 0 ? '^' : 'v';\nconst changeFormat = arrow + ' ' + Math.abs(change) + '$ (' + Math.abs(percentChange) + '%)';\n\n// Speichere alle Daten im Flow-Kontext\nflow.set('stock_price', currentPrice);\nflow.set('stock_change', changeFormat);\nflow.set('stock_symbol', symbol);\nflow.set('current_time', timeStr);\n\n// Rotiere Stock Mode (price -> change -> full)\nconst modes = ['price', 'change', 'full'];\nconst currentMode = flow.get('stock_mode') || 'price';\nconst currentIndex = modes.indexOf(currentMode);\nconst nextIndex = (currentIndex + 1) % modes.length;\nflow.set('stock_mode', modes[nextIndex]);\n\n// Setze switches_mode auf Stock\nflow.set('switches_mode', 'Stock');\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1210,
+        "y": 1380,
+        "wires": [
+            [
+                "85e67035ab842076"
             ]
         ]
     },
@@ -883,7 +811,7 @@
         "type": "function",
         "z": "73619a0e20b766b0",
         "name": "Stock Data Processor",
-        "func": "// Überprüfe, ob gültige Daten vorhanden sind\nif (!msg.payload || !msg.payload.c) {\n    node.error(\"Ungültige Aktiendaten erhalten\");\n    return null;\n}\n\n// Extrahiere und formatiere Daten\nconst stockData = msg.payload;\nconst symbol = msg.symbol || 'AAPL';\n\n// Aktuelle Zeit\nconst now = new Date();\nconst hours = now.getHours();\nconst minutes = now.getMinutes();\nconst timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes;\n\n// Aktienpreis und Änderungen\nconst currentPrice = stockData.c.toFixed(2) + '$';\nconst change = stockData.d.toFixed(2);\nconst percentChange = stockData.dp.toFixed(2);\n\n// Pfeil-Symbol basierend auf Kursänderung (ASCII-Version)\nconst arrow = percentChange >= 0 ? '^' : 'v';\nconst changeFormat = arrow + ' ' + Math.abs(change) + '$ (' + Math.abs(percentChange) + '%)';\n\n// Speichere alle Daten im Flow-Kontext\nflow.set('stock_price', currentPrice);\nflow.set('stock_change', changeFormat);\nflow.set('stock_symbol', symbol);\nflow.set('current_time', timeStr);\n\n// Rotiere Stock Mode (price -> change -> full)\nconst modes = ['price', 'change', 'full'];\nconst currentMode = flow.get('stock_mode') || 'price';\nconst currentIndex = modes.indexOf(currentMode);\nconst nextIndex = (currentIndex + 1) % modes.length;\nflow.set('stock_mode', modes[nextIndex]);\n\n// Setze switches_mode auf Stock\nflow.set('switches_mode', 'Stock');\n\nreturn msg;",
+        "func": "// VOLLSTÄNDIGE DEBUG-VERSION\nnode.log(\"=== STOCK DATA PROCESSOR DEBUG ===\");\n\n// 1. Überprüfe gesamte Nachricht\nnode.log(\"Komplette Nachricht: \" + JSON.stringify(msg, null, 2));\n\n// 2. Überprüfe Payload-Typ und -Inhalt\nnode.log(\"Payload-Typ: \" + typeof msg.payload);\nnode.log(\"Payload-Inhalt: \" + JSON.stringify(msg.payload, null, 2));\n\n// 3. Überprüfe, ob überhaupt Daten vorhanden sind\nif (!msg.payload) {\n   node.error(\"Keine Daten empfangen - msg.payload ist null/undefined\");\n   return null;\n}\n\n// 4. Prüfe auf Fehlermeldung in der API-Antwort\nif (msg.payload.error) {\n   node.error(\"API-Fehler: \" + msg.payload.error);\n   return null;\n}\n\n// 5. Detaillierte Analyse der verfügbaren Felder\nconst availableFields = Object.keys(msg.payload);\nnode.log(\"Verfügbare Felder in payload: \" + JSON.stringify(availableFields));\n\n// 6. Prüfe spezifisch auf 'c' Feld\nnode.log(\"msg.payload.c existiert: \" + (msg.payload.hasOwnProperty('c')));\nnode.log(\"msg.payload.c Wert: \" + msg.payload.c);\nnode.log(\"msg.payload.c Typ: \" + typeof msg.payload.c);\n\n// Rest der Funktion...\nif (typeof msg.payload.c === 'undefined' || msg.payload.c === null) {\n   node.warn(\"Feld 'c' (current price) fehlt oder ist null\");\n   \n   // Setze Dummy-Daten\n   flow.set('stock_price', 'N/A');\n   flow.set('stock_change', 'N/A');\n   flow.set('stock_symbol', msg.symbol || 'AAPL');\n   \n   const now = new Date();\n   const timeStr = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();\n   flow.set('current_time', timeStr);\n   flow.set('stock_mode', 'price');\n   flow.set('switches_mode', 'Stock');\n   \n   node.warn(\"Dummy-Werte gesetzt - Display wird trotzdem aktualisiert\");\n   msg.payload = 'stock_data_updated';\n   return msg;\n}\n\n// Normale Verarbeitung wenn Daten da sind\nconst stockData = msg.payload;\nconst symbol = msg.symbol || 'AAPL';\nnode.log(\"Verarbeitung startet für Symbol: \" + symbol);\n\nreturn msg;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -894,7 +822,7 @@
         "y": 1540,
         "wires": [
             [
-                "1996b9100a3bb7f4"
+                "42dccb0453774a1f"
             ]
         ]
     },
@@ -906,7 +834,7 @@
         "method": "GET",
         "ret": "obj",
         "paytoqs": "ignore",
-        "url": "https://finnhub.io/api/v1/quote?symbol=AAPL&token=d0m7gmpr01qkesvj2im0d0m7gmpr01qkesvj2img",
+        "url": "https://finnhub.io/api/v1/quote?symbol=AAPL&token=API-TOKEN",
         "tls": "",
         "persist": false,
         "proxy": "",
@@ -923,10 +851,91 @@
         ]
     },
     {
-        "id": "fb6ee8daa34f356e",
+        "id": "42dccb0453774a1f",
+        "type": "debug",
+        "z": "73619a0e20b766b0",
+        "name": "debug 2",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1750,
+        "y": 1620,
+        "wires": []
+    },
+    {
+        "id": "ab0cf9e476c8846c",
+        "type": "delay",
+        "z": "73619a0e20b766b0",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 2140,
+        "y": 1020,
+        "wires": [
+            [
+                "d72a326f373d8fc1"
+            ]
+        ]
+    },
+    {
+        "id": "78defdd32aa8d72f",
+        "type": "function",
+        "z": "73619a0e20b766b0",
+        "name": "Only update if in clock mode",
+        "func": "// Only proceed if we're in time mode\nconst currentMode = flow.get('switches_mode') || 'Stock';\nif (currentMode === 'Stock') {\n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 1680,
+        "wires": [
+            [
+                "f15478bfc1c3599a"
+            ]
+        ]
+    },
+    {
+        "id": "3abb43a9e49a8bdd",
+        "type": "function",
+        "z": "73619a0e20b766b0",
+        "name": "Only update if in clock mode",
+        "func": "// Only proceed if we're in time mode\nconst currentMode = flow.get('switches_mode') || 'Stock';\nif (currentMode === 'Stock') {\n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 1380,
+        "wires": [
+            [
+                "fetch_stock_data"
+            ]
+        ]
+    },
+    {
+        "id": "crypto_timer_inject",
         "type": "inject",
-        "z": "fa7e41cd5565ceab",
-        "name": "Update Weather (every 5min)",
+        "z": "73619a0e20b766b0",
+        "name": "Crypto Update (every 5min)",
         "props": [
             {
                 "p": "payload"
@@ -935,27 +944,27 @@
         "repeat": "300",
         "crontab": "",
         "once": true,
-        "onceDelay": "5",
+        "onceDelay": "7",
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 140,
-        "y": 160,
+        "x": 340,
+        "y": 2200,
         "wires": [
             [
-                "ae263271ad2da54a"
+                "crypto_http_request"
             ]
         ]
     },
     {
-        "id": "ae263271ad2da54a",
+        "id": "crypto_http_request",
         "type": "http request",
-        "z": "fa7e41cd5565ceab",
-        "name": "Get Real-time Weather",
+        "z": "73619a0e20b766b0",
+        "name": "Get Crypto Data",
         "method": "GET",
         "ret": "obj",
         "paytoqs": "ignore",
-        "url": "https://api.openweathermap.org/data/2.5/weather?q=Luxembourg&units=metric&appid=dd23ad94f206a6655e4d0dc9f2629032",
+        "url": "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,cardano,polkadot,chainlink&vs_currencies=usd&include_24hr_change=true",
         "tls": "",
         "persist": false,
         "proxy": "",
@@ -963,21 +972,21 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 410,
-        "y": 160,
+        "x": 610,
+        "y": 2200,
         "wires": [
             [
-                "1b2247d8010a5ca5",
-                "e55c99f6a2c66318"
+                "crypto_process_data",
+                "crypto_debug_response"
             ]
         ]
     },
     {
-        "id": "e55c99f6a2c66318",
+        "id": "crypto_debug_response",
         "type": "debug",
-        "z": "fa7e41cd5565ceab",
-        "name": "Weather API Response",
-        "active": true,
+        "z": "73619a0e20b766b0",
+        "name": "Crypto API Response",
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -985,37 +994,37 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 420,
-        "y": 100,
+        "x": 830,
+        "y": 2160,
         "wires": []
     },
     {
-        "id": "1b2247d8010a5ca5",
+        "id": "crypto_process_data",
         "type": "function",
-        "z": "fa7e41cd5565ceab",
-        "name": "Extract Weather Data",
-        "func": "// Check if we have valid data\nif (!msg.payload || !msg.payload.main || !msg.payload.weather) {\n    node.error(\"Invalid weather data received\");\n    return null;\n}\n\n// Extract and format data\nconst weather = msg.payload;\n\n// Current time\nconst now = new Date();\nconst hours = now.getHours();\nconst minutes = now.getMinutes();\nconst timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes;\n\n// Round temperature to nearest integer\nconst temperature = Math.round(weather.main.temp);\n\n// Store all data in flow context\nflow.set('temperature', temperature + '°C');\nflow.set('humidity', weather.main.humidity + '%');\nflow.set('wind', Math.round(weather.wind.speed) + ' km/h');\n\n// Ensure we have weather description\nlet description = \"Unknown\";\nif (weather.weather && weather.weather.length > 0 && weather.weather[0].description) {\n    description = weather.weather[0].description;\n}\nflow.set('description', description);\n\n// Store city name and current time\nflow.set('city', weather.name + ' ' + timeStr);\n\n// Set default display mode if not set\nif (!flow.get('display_mode')) {\n    flow.set('display_mode', 'temperature');\n}\n\n// Send current display mode to the display handler\nmsg.payload = flow.get('display_mode');\n\n// Add last_updated timestamp to track successful updates\nflow.set('last_updated', Date.now());\n\nreturn msg;",
+        "z": "73619a0e20b766b0",
+        "name": "Process Crypto Data",
+        "func": "// Check if we have valid data\nif (!msg.payload) {\n    node.error(\"No crypto data received\");\n    return null;\n}\n\n// Debug info\nnode.log(\"Received crypto data: \" + JSON.stringify(msg.payload));\n\n// Check for API error\nif (msg.payload.error) {\n    node.error(\"Crypto API error: \" + msg.payload.error);\n    return null;\n}\n\n// Define crypto symbols and their display names\nconst cryptos = [\n    { id: 'bitcoin', symbol: 'BTC', name: 'Bitcoin' },\n    { id: 'ethereum', symbol: 'ETH', name: 'Ethereum' },\n    { id: 'cardano', symbol: 'ADA', name: 'Cardano' },\n    { id: 'polkadot', symbol: 'DOT', name: 'Polkadot' },\n    { id: 'chainlink', symbol: 'LINK', name: 'Chainlink' }\n];\n\n// Current time\nconst now = new Date();\nconst hours = now.getHours();\nconst minutes = now.getMinutes();\nconst timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes;\n\n// Get current crypto index for rotation\nlet currentIndex = flow.get('crypto_index') || 0;\nconst currentCrypto = cryptos[currentIndex];\n\n// Check if the crypto data exists\nif (!msg.payload[currentCrypto.id]) {\n    node.warn(\"No data for \" + currentCrypto.name + \", using fallback\");\n    // Set fallback values\n    flow.set('crypto_price', 'N/A');\n    flow.set('crypto_change', 'N/A');\n    flow.set('crypto_symbol', currentCrypto.symbol);\n    flow.set('crypto_name', currentCrypto.name);\n    flow.set('current_time', timeStr);\n} else {\n    // Extract crypto data\n    const cryptoData = msg.payload[currentCrypto.id];\n    const price = cryptoData.usd;\n    const change24h = cryptoData.usd_24h_change || 0;\n\n    // Format price (different formatting for different price ranges)\n    let formattedPrice;\n    if (price >= 1000) {\n        formattedPrice = '$' + price.toFixed(0); // No decimals for high prices\n    } else if (price >= 1) {\n        formattedPrice = '$' + price.toFixed(2); // 2 decimals for mid prices\n    } else {\n        formattedPrice = '$' + price.toFixed(4); // 4 decimals for low prices\n    }\n\n    // Format 24h change with arrow\n    const arrow = change24h >= 0 ? '^' : 'v';\n    const changeFormatted = arrow + ' ' + Math.abs(change24h).toFixed(2) + '%';\n\n    // Store data in flow context\n    flow.set('crypto_price', formattedPrice);\n    flow.set('crypto_change', changeFormatted);\n    flow.set('crypto_symbol', currentCrypto.symbol);\n    flow.set('crypto_name', currentCrypto.name);\n    flow.set('current_time', timeStr);\n\n    node.log(\"Crypto data processed: \" + currentCrypto.symbol + \" = \" + formattedPrice + \" (\" + changeFormatted + \")\");\n}\n\n// Rotate to next crypto for next update\nconst nextIndex = (currentIndex + 1) % cryptos.length;\nflow.set('crypto_index', nextIndex);\n\n// Set default crypto mode if not set\nif (!flow.get('crypto_mode')) {\n    flow.set('crypto_mode', 'price');\n}\n\n// Add last_updated timestamp\nflow.set('crypto_last_updated', Date.now());\n\n// Send current switches mode to the display handler\nconst switchesMode = flow.get('switches_mode') || 'time';\nmsg.payload = switchesMode;\n\nreturn msg;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 640,
-        "y": 160,
+        "x": 870,
+        "y": 2200,
         "wires": [
             [
-                "13b9f24fe92121be",
-                "67daf24ae17cc899"
+                "crypto_debug_processed",
+                "1996b9100a3bb7f4"
             ]
         ]
     },
     {
-        "id": "67daf24ae17cc899",
+        "id": "crypto_debug_processed",
         "type": "debug",
-        "z": "fa7e41cd5565ceab",
-        "name": "Weather Data Processed",
-        "active": true,
+        "z": "73619a0e20b766b0",
+        "name": "Crypto Data Processed",
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -1023,317 +1032,15 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 650,
-        "y": 100,
+        "x": 1130,
+        "y": 2160,
         "wires": []
     },
     {
-        "id": "a6fa13a3e71c899b",
+        "id": "crypto_error_recovery",
         "type": "inject",
-        "z": "fa7e41cd5565ceab",
-        "name": "Initialize & Clear LCD",
-        "props": [
-            {
-                "p": "topic",
-                "vt": "str"
-            },
-            {
-                "p": "payload",
-                "vt": "str",
-                "v": ""
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": true,
-        "onceDelay": "1",
-        "topic": "init",
-        "x": 170,
-        "y": 280,
-        "wires": [
-            [
-                "672637f87c614915"
-            ]
-        ]
-    },
-    {
-        "id": "672637f87c614915",
-        "type": "exec",
-        "z": "fa7e41cd5565ceab",
-        "command": "python /home/star2050/digilab/lcd/init.py",
-        "addpay": "",
-        "append": "--line 1 --message \"Initializing...\" && python /home/star2050/digilab/lcd/init.py --line 2 --message \"Please wait\"",
-        "useSpawn": "false",
-        "timer": "",
-        "winHide": false,
-        "oldrc": false,
-        "name": "Run Init/Clear Script",
-        "x": 420,
-        "y": 280,
-        "wires": [
-            [
-                "8aa95754f430fa79"
-            ],
-            [
-                "952ff3f72cd38408"
-            ],
-            [
-                "8a15fec6da7dfbb6"
-            ]
-        ]
-    },
-    {
-        "id": "f90fee67abce26fb",
-        "type": "template",
-        "z": "fa7e41cd5565ceab",
-        "name": "Build Write Command",
-        "field": "payload",
-        "fieldType": "msg",
-        "format": "handlebars",
-        "syntax": "mustache",
-        "template": " --line \"{{line}}\" --message \"{{payload}}\"",
-        "output": "str",
-        "x": 1340,
-        "y": 440,
-        "wires": [
-            [
-                "fb91b77cfd7929a6",
-                "4ff29c8700dbdb3d"
-            ]
-        ]
-    },
-    {
-        "id": "fb91b77cfd7929a6",
-        "type": "exec",
-        "z": "fa7e41cd5565ceab",
-        "command": "python /home/star2050/digilab/lcd/write.py",
-        "addpay": "payload",
-        "append": "",
-        "useSpawn": "false",
-        "timer": "",
-        "winHide": false,
-        "oldrc": false,
-        "name": "Run Write Script",
-        "x": 1600,
-        "y": 440,
-        "wires": [
-            [
-                "05a44b2e3304aa0f"
-            ],
-            [
-                "288dc3df1f88a945"
-            ],
-            [
-                "1ec97ac95c2b6c06"
-            ]
-        ]
-    },
-    {
-        "id": "8aa95754f430fa79",
-        "type": "debug",
-        "z": "fa7e41cd5565ceab",
-        "name": "Init stdout",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "x": 650,
-        "y": 240,
-        "wires": []
-    },
-    {
-        "id": "952ff3f72cd38408",
-        "type": "debug",
-        "z": "fa7e41cd5565ceab",
-        "name": "Init stderr",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "x": 650,
-        "y": 280,
-        "wires": []
-    },
-    {
-        "id": "8a15fec6da7dfbb6",
-        "type": "debug",
-        "z": "fa7e41cd5565ceab",
-        "name": "Init RC",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "x": 640,
-        "y": 320,
-        "wires": []
-    },
-    {
-        "id": "05a44b2e3304aa0f",
-        "type": "debug",
-        "z": "fa7e41cd5565ceab",
-        "name": "Write stdout",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "x": 1830,
-        "y": 420,
-        "wires": []
-    },
-    {
-        "id": "288dc3df1f88a945",
-        "type": "debug",
-        "z": "fa7e41cd5565ceab",
-        "name": "Write stderr",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "x": 1830,
-        "y": 460,
-        "wires": []
-    },
-    {
-        "id": "1ec97ac95c2b6c06",
-        "type": "debug",
-        "z": "fa7e41cd5565ceab",
-        "name": "Write RC",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "x": 1820,
-        "y": 500,
-        "wires": []
-    },
-    {
-        "id": "4ff29c8700dbdb3d",
-        "type": "debug",
-        "z": "fa7e41cd5565ceab",
-        "name": "Debug Write Command",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "x": 1630,
-        "y": 380,
-        "wires": []
-    },
-    {
-        "id": "13b9f24fe92121be",
-        "type": "function",
-        "z": "fa7e41cd5565ceab",
-        "name": "Update Display Based on Mode",
-        "func": "// Get current display mode\nconst mode = msg.payload;\nflow.set('display_mode', mode);\n\n// Get data from flow context\nconst temperature = flow.get('temperature') || 'N/A';\nconst humidity = flow.get('humidity') || 'N/A';\nconst wind = flow.get('wind') || 'N/A';\nconst description = flow.get('description') || 'N/A';\nconst city = flow.get('city') || 'Connecting...';\n\n// Clean function to remove/replace problematic characters\nfunction cleanText(text) {\n    if (typeof text !== 'string') return 'N/A';\n    \n    // Replace HTML entities and problematic characters\n    return text\n        .replace(/&#x2F;/g, '|')         // Replace HTML entity for slash\n        .replace(/&#(\\d+);/g, '')        // Remove all other HTML entities\n        .replace(/[^\\x20-\\x7E]/g, '')    // Keep only basic ASCII characters\n        .replace(/[^\\w\\s.,°%\\/-]/g, ''); // Keep only alphanumeric, spaces, and some symbols\n}\n\n// Ensure values are strings and limit to display width (16 chars for standard LCD)\nfunction formatForDisplay(text, maxLength = 16) {\n    let cleaned = cleanText(String(text));\n    return cleaned.length > maxLength ? cleaned.substring(0, maxLength) : cleaned;\n}\n\n// Clean all displayed text\nconst cleanCity = formatForDisplay(city);\nconst cleanTemp = formatForDisplay(temperature);\nconst cleanHumidity = formatForDisplay(humidity);\nconst cleanWind = formatForDisplay(wind);\n\n// Special formatting for description - capitalize first letter\nlet cleanDescription = formatForDisplay(description);\nif (cleanDescription.length > 0) {\n    cleanDescription = cleanDescription.charAt(0).toUpperCase() + cleanDescription.slice(1);\n}\n\n// Prepare messages for line 1 and 2\nlet line1;\nlet line2;\n\n// Set content based on mode - now show mode on line 1 and data on line 2\nswitch(mode) {\n    case 'temperature':\n        line1 = { payload: \"Temperatur\", line: 1 };\n        line2 = { payload: cleanTemp, line: 2 };\n        break;\n    case 'humidity':\n        line1 = { payload: \"Luftfeuchtigkeit\", line: 1 };\n        line2 = { payload: cleanHumidity, line: 2 };\n        break;\n    case 'wind':\n        line1 = { payload: \"Windgeschwindigk.\", line: 1 };\n        line2 = { payload: cleanWind, line: 2 };\n        break;\n    case 'description':\n        line1 = { payload: \"Wetterlage\", line: 1 };\n        line2 = { payload: cleanDescription, line: 2 };\n        break;\n    case 'city':\n        line1 = { payload: \"Standort & Zeit\", line: 1 };\n        line2 = { payload: cleanCity, line: 2 };\n        break;\n    default:\n        line1 = { payload: \"Temperatur\", line: 1 };\n        line2 = { payload: cleanTemp, line: 2 };\n}\n\n// Return both messages as array\nreturn [line1, line2];",
-        "outputs": 2,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 960,
-        "y": 280,
-        "wires": [
-            [
-                "f90fee67abce26fb"
-            ],
-            [
-                "d2a922c34b10889d"
-            ]
-        ]
-    },
-    {
-        "id": "db392f83bdc92c9c",
-        "type": "rpi-gpio in",
-        "z": "fa7e41cd5565ceab",
-        "name": "Mode Switch Button",
-        "pin": "16",
-        "intype": "up",
-        "debounce": "100",
-        "read": false,
-        "bcm": true,
-        "x": 140,
-        "y": 420,
-        "wires": [
-            [
-                "885b20d05f14619c",
-                "b988d94fbf0c2186"
-            ]
-        ]
-    },
-    {
-        "id": "885b20d05f14619c",
-        "type": "function",
-        "z": "fa7e41cd5565ceab",
-        "name": "Cycle Through Display Modes",
-        "func": "// Only process when button is pressed (rising edge)\nif (msg.payload !== 1) return null;\n\n// Get current mode\nconst currentMode = flow.get('display_mode') || 'temperature';\n\n// Define the cycle order - limited to just 4 essential modes\nconst modes = ['temperature', 'humidity', 'wind', 'description'];\n\n// Track button press count to prevent excessive cycling\nlet pressCount = flow.get('button_press_count') || 0;\npressCount++;\n\n// Store press count for debouncing purposes\nflow.set('button_press_count', pressCount);\nflow.set('last_button_press', Date.now());\n\n// Find current index\nlet currentIndex = modes.indexOf(currentMode);\n\n// If current mode not found in array, default to first mode\nif (currentIndex === -1) currentIndex = 0;\n\n// Move to next mode (or back to first if at end)\n// This ensures limited cycling through only 4 modes\nlet nextIndex = (currentIndex + 1) % modes.length;\n\n// Set the next mode\nconst nextMode = modes[nextIndex];\nflow.set('display_mode', nextMode);\nmsg.payload = nextMode;\n\n// Also log mode change\nnode.log(\"Display mode changed to: \" + nextMode + \" (press #\" + pressCount + \")\");\n\n// Return the message with the new mode\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 600,
-        "y": 420,
-        "wires": [
-            [
-                "13b9f24fe92121be",
-                "3891f2a1e6544f77"
-            ]
-        ]
-    },
-    {
-        "id": "b988d94fbf0c2186",
-        "type": "debug",
-        "z": "fa7e41cd5565ceab",
-        "name": "Button Press",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 340,
-        "y": 460,
-        "wires": []
-    },
-    {
-        "id": "3891f2a1e6544f77",
-        "type": "debug",
-        "z": "fa7e41cd5565ceab",
-        "name": "Mode Changed",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 870,
-        "y": 420,
-        "wires": []
-    },
-    {
-        "id": "f5b22d78e2c1a123",
-        "type": "inject",
-        "z": "fa7e41cd5565ceab",
-        "name": "Error Recovery (every hour)",
+        "z": "73619a0e20b766b0",
+        "name": "Crypto Error Recovery (every hour)",
         "props": [
             {
                 "p": "payload"
@@ -1346,88 +1053,61 @@
         "topic": "",
         "payload": "check",
         "payloadType": "str",
-        "x": 170,
-        "y": 220,
+        "x": 330,
+        "y": 2260,
         "wires": [
             [
-                "9c76e11a3254fb82"
+                "crypto_check_updates"
             ]
         ]
     },
     {
-        "id": "9c76e11a3254fb82",
+        "id": "crypto_check_updates",
         "type": "function",
-        "z": "fa7e41cd5565ceab",
-        "name": "Check Last Update Time",
-        "func": "// Get last update timestamp\nconst lastUpdated = flow.get('last_updated') || 0;\nconst now = Date.now();\n\n// If no update in the last 20 minutes (1200000ms), force refresh\nif (now - lastUpdated > 1200000) {\n    node.warn(\"No weather updates for 20+ minutes. Forcing refresh.\");\n    // Set payload to trigger a new weather fetch\n    msg.payload = Date.now();\n    return msg;\n}\n\n// Otherwise no need to do anything\nreturn null;",
+        "z": "73619a0e20b766b0",
+        "name": "Check Crypto Update Time",
+        "func": "// Get last update timestamp\nconst lastUpdated = flow.get('crypto_last_updated') || 0;\nconst now = Date.now();\n\n// If no update in the last 20 minutes (1200000ms), force refresh\nif (now - lastUpdated > 1200000) {\n    node.warn(\"No crypto updates for 20+ minutes. Forcing refresh.\");\n    // Set payload to trigger a new crypto fetch\n    msg.payload = Date.now();\n    return msg;\n}\n\n// Otherwise no need to do anything\nreturn null;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 410,
-        "y": 220,
+        "x": 650,
+        "y": 2260,
         "wires": [
             [
-                "ae263271ad2da54a"
+                "crypto_http_request"
             ]
         ]
     },
     {
-        "id": "d2a922c34b10889d",
-        "type": "delay",
-        "z": "fa7e41cd5565ceab",
-        "name": "",
-        "pauseType": "delay",
-        "timeout": "200",
-        "timeoutUnits": "milliseconds",
-        "rate": "1",
-        "nbRateUnits": "1",
-        "rateUnits": "second",
-        "randomFirst": "1",
-        "randomLast": "5",
-        "randomUnits": "seconds",
-        "drop": false,
-        "allowrate": false,
+        "id": "crypto_comment",
+        "type": "comment",
+        "z": "73619a0e20b766b0",
+        "name": "CRYPTO DATA SECTION",
+        "info": "",
+        "x": 360,
+        "y": 2120,
+        "wires": []
+    },
+    {
+        "id": "crypto_manual_button",
+        "type": "function",
+        "z": "73619a0e20b766b0",
+        "name": "Manual Crypto Switch (Button2)",
+        "func": "// Only process when button is pressed (rising edge)\nif (msg.payload !== 1) return null;\n\n// Only cycle crypto if we're in krypto display mode\nconst switchesMode = flow.get('switches_mode') || 'time';\nif (switchesMode !== 'crypto') {\n    // We're not in krypto mode, so button does nothing\n    return null;\n}\n\n// Define crypto symbols and their display names\nconst cryptos = [\n    { id: 'bitcoin', symbol: 'BTC', name: 'Bitcoin' },\n    { id: 'ethereum', symbol: 'ETH', name: 'Ethereum' },\n    { id: 'cardano', symbol: 'ADA', name: 'Cardano' },\n    { id: 'polkadot', symbol: 'DOT', name: 'Polkadot' },\n    { id: 'chainlink', symbol: 'LINK', name: 'Chainlink' }\n];\n\n// Get current crypto index for manual rotation\nlet currentIndex = flow.get('crypto_index') || 0;\n\n// Move to next crypto manually\nconst nextIndex = (currentIndex + 1) % cryptos.length;\nflow.set('crypto_index', nextIndex);\n\nconst nextCrypto = cryptos[nextIndex];\nnode.log(\"Manual crypto switch to: \" + nextCrypto.symbol);\n\n// Trigger immediate API call for the new crypto\nmsg.payload = Date.now();\nmsg.symbol = nextCrypto.id;\nmsg.manual_switch = true;\n\nreturn msg;",
         "outputs": 1,
-        "x": 1200,
-        "y": 320,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 1860,
         "wires": [
             [
-                "f90fee67abce26fb"
+                "crypto_http_request"
             ]
-        ]
-    },
-    {
-        "id": "a9ed5169ce53b36e",
-        "type": "rpi-gpio in",
-        "z": "fa7e41cd5565ceab",
-        "name": "Schalter 2",
-        "pin": "20",
-        "intype": "tri",
-        "debounce": "25",
-        "read": false,
-        "bcm": true,
-        "x": 130,
-        "y": 560,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "e4e609f0cd636984",
-        "type": "rpi-gpio in",
-        "z": "fa7e41cd5565ceab",
-        "name": "Schalter 1",
-        "pin": "21",
-        "intype": "tri",
-        "debounce": "25",
-        "read": false,
-        "bcm": true,
-        "x": 130,
-        "y": 620,
-        "wires": [
-            []
         ]
     }
 ]
